@@ -1,4 +1,5 @@
 // src/controllers/interactionsController.js
+const path = require("path");
 const { Op } = require("sequelize");
 const Interaction = require("../models/interactionsModel");
 
@@ -30,6 +31,7 @@ function parsePhoneAndIds(raw) {
   return { phone: phoneClean, ids };
 }
 
+// GET /api/historico/:phoneAndIds  -> JSON
 async function getHistorico(req, res) {
   try {
     const { phone, ids } = parsePhoneAndIds(req.params.phoneAndIds);
@@ -54,4 +56,13 @@ async function getHistorico(req, res) {
   }
 }
 
-module.exports = { getHistorico };
+// GET /historico/:phoneAndIds -> renderiza a view única
+function renderHistoricoView(req, res) {
+  // Não precisa passar nada do servidor; o JS busca via /api/...
+  // Se quiser, dá para injetar o phoneAndIds para o JS usar.
+  res.render("historicoView", {
+    phoneAndIds: req.params.phoneAndIds || "",
+  });
+}
+
+module.exports = { getHistorico, renderHistoricoView };
