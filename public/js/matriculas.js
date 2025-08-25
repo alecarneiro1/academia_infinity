@@ -20,6 +20,10 @@
   const btnEditar = document.getElementById("btnEditar");
   const btnConfirmar = document.getElementById("btnConfirmar");
 
+  // Modal de sucesso
+  const successOverlay = document.getElementById("successOverlay");
+  const btnFecharSucesso = document.getElementById("btnFecharSucesso");
+
   // Campos da modal
   const c_nome = document.getElementById("c_nome");
   const c_endereco = document.getElementById("c_endereco");
@@ -122,6 +126,16 @@
     overlay.hidden = true;
   }
 
+  // Modal de sucesso
+  function openSuccessModal() {
+    successOverlay.hidden = false;
+    successOverlay.classList.add("open");
+  }
+  function closeSuccessModal() {
+    successOverlay.classList.remove("open");
+    successOverlay.hidden = true;
+  }
+
   /* ========= Submit com confirmação ========= */
   let confirmedOnce = false;
   form.addEventListener("submit", (e) => {
@@ -178,12 +192,39 @@
 
       confirmedOnce = true;
       closeModal();
-      form.submit(); // envia de verdade
+
+      // Envia os dados via AJAX para o webhook
+      const formData = new FormData(form);
+      fetch(form.action, {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => {
+          if (res.ok) {
+            openSuccessModal();
+            // form.reset(); // opcional: limpar formulário
+          } else {
+            alert("Erro ao enviar os dados. Tente novamente.");
+            confirmedOnce = false;
+          }
+        })
+        .catch(() => {
+          alert("Erro ao enviar os dados. Tente novamente.");
+          confirmedOnce = false;
+        });
     };
   });
 
   // Fecha modal clicando fora
   overlay?.addEventListener("click", (ev) => {
     if (ev.target === overlay) closeModal();
+  });
+
+  // Fecha modal de sucesso clicando fora ou no botão
+  successOverlay?.addEventListener("click", (ev) => {
+    if (ev.target === successOverlay) closeSuccessModal();
+  });
+  btnFecharSucesso?.addEventListener("click", () => {
+    closeSuccessModal();
   });
 })();

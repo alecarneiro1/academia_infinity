@@ -3,10 +3,9 @@ const router = require("express").Router();
 const ctrl = require("../controllers/matriculasController");
 
 // GET do formulário (singular e plural)
-router.get("/matricula", ctrl.form);
 router.get("/matriculas", ctrl.form);
 
 // (opcional) página de sucesso
-router.get("/matricula/sucesso", ctrl.sucesso);
+// router.get("/matricula/sucesso", ctrl.sucesso);
 
 module.exports = router;
