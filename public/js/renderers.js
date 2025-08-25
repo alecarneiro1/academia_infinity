@@ -27,7 +27,7 @@ export function renderHeader({ contactNumber }) {
 
 export function renderCTA(contactNumber, label = "Falar com o contato") {
   return `
-    <a class="cta" href="https://wa.me/${contactNumber}" target="_blank" rel="noopener noreferrer">
+    <a class="cta" href="${contactNumber}" target="_blank" rel="noopener noreferrer">
       <span class="cta__icon">💬</span> ${label}
     </a>
   `;
@@ -35,11 +35,8 @@ export function renderCTA(contactNumber, label = "Falar com o contato") {
 
 // Decide se a mensagem é do "usuário" ou "agente"
 function who(msg) {
-  // regra simples: se houver agentResponse, é mensagem do agente; se houver userMessage, é do usuário.
-  // Você pode ajustar se tiver mais contexto por linha.
   if (msg.agentResponse && !msg.userMessage) return "agent";
   if (msg.userMessage && !msg.agentResponse) return "user";
-  // fallback: se tiver os dois ou nenhum, alterna por id par/ímpar
   return msg.id % 2 === 0 ? "user" : "agent";
 }
 
@@ -51,6 +48,9 @@ export function renderMessageBubble(msg) {
       : (msg.userMessage ?? "");
 
   const hora = fmtHora(msg.time);
+  const name = side === "agent" ? "Bot" : "Você";
+  const alt = side === "agent" ? " alt" : "";
+  const nameClass = side === "agent" ? "name alt" : "name";
 
   return `
     <div class="bubble bubble--${side}">
