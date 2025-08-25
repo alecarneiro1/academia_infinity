@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Formulário de Matrícula • Academia Infinity</title>
+
+  <!-- CSS do formulário -->
+  <link rel="stylesheet" href="/painel/css/matriculas.css">
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <!-- o arquivo já está em /root/apps/painel/public/media/LOGO INFINITY.png -->
+      <img class="logo" src="/painel/media/LOGO%20INFINITY.png" alt="Academia Infinity" />
+      <h1 class="title">Formulário de Matrícula</h1>
+    </header>
+
+    <section class="card">
+<form class="form" method="post" action="<%= webhookUrl %>">
+  <div class="grid">
+    <!-- Nome Completo (novo campo, 100% width, primeiro do formulário) -->
+    <label class="field full">
+      <span>Nome completo<span class="req">*</span></span>
+      <input type="text" name="nome_completo" required>
+    </label>
+
+    <!-- Endereço (novo campo antes do CEP) -->
+    <label class="field">
+      <span>Endereço<span class="req">*</span></span>
+      <input type="text" name="endereco" required>
+    </label>
+
+    <!-- CEP (autoformat 99999-999) -->
+    <label class="field">
+      <span>CEP<span class="req">*</span></span>
+      <input id="cep" type="text" name="cep" inputmode="numeric" maxlength="9" required>
+    </label>
+
+    <!-- CPF (autoformat 000.000.000-00) -->
+    <label class="field">
+      <span>CPF<span class="req">*</span></span>
+      <input id="cpf" type="text" name="cpf" inputmode="numeric" maxlength="14" required>
+    </label>
+
+    <!-- WhatsApp: +55 fixo com máscara ao digitar  -->
+    <label class="field">
+      <span>WhatsApp<span class="req">*</span></span>
+
+      <div class="input-prefix">
+        <span class="prefix">+55</span>
+        <!-- usuário digita só DDD+telefone -->
+        <input id="whatsapp_local" type="text" inputmode="numeric" autocomplete="tel"
+               placeholder="(42) 9156-2180" maxlength="16" required>
+      </div>
+
+      <!-- este hidden é enviado ao n8n normalizado -->
+      <input id="whatsapp" name="whatsapp" type="hidden">
+      <small class="hint">Digite apenas DDD e número; +55 é fixo.</small>
+    </label>
+
+    <label class="field">
+      <span>Data de nascimento<span class="req">*</span></span>
+      <input id="data_nascimento" type="text" name="data_nascimento" placeholder="dd/mm/aaaa" maxlength="10" required>
+    </label>
+
+    <label class="field">
+      <span>Plano<span class="req">*</span></span>
+      <select name="plano" required>
+        <option>Mensal (R$ 140)</option>
+        <option>Trimestral (R$ 390)</option>
+        <option>Semestral (R$ 720)</option>
+      </select>
+    </label>
+
+    <!-- Objetivo: agora em checkboxes -->
+    <fieldset class="field full">
+      <legend>Objetivo</legend>
+      <div class="checks">
+        <label><input type="checkbox" name="objetivo[]" value="Hipertrofia"><span>Hipertrofia</span></label>
+        <label><input type="checkbox" name="objetivo[]" value="Perda de peso / emagrecimento"><span>Perda de peso / emagrecimento</span></label>
+        <label><input type="checkbox" name="objetivo[]" value="Condicionamento físico geral"><span>Condicionamento físico geral</span></label>
+        <label><input type="checkbox" name="objetivo[]" value="Definição corporal / estética"><span>Definição corporal / estética</span></label>
+        <label><input type="checkbox" name="objetivo[]" value="Saúde e prevenção de doenças"><span>Saúde e prevenção de doenças</span></label>
+        <label><input type="checkbox" name="objetivo[]" value="Qualidade de vida"><span>Qualidade de vida</span></label>
+        <label><input type="checkbox" name="objetivo[]" value="Performance esportiva"><span>Performance esportiva</span></label>
+        <label><input type="checkbox" name="objetivo[]" value="Outro"><span>Outro</span></label>
+      </div>
+    </fieldset>
+
+    <!-- Por onde conheceu (opcional) -->
+    <label class="field full">
+      <span>Por onde conheceu a academia Infinity?</span>
+      <textarea name="origem" rows="3" placeholder="Instagram, amigo, panfleto, etc."></textarea>
+    </label>
+  </div>
+
+  <div class="actions">
+    <button class="btn" type="submit">Enviar</button>
+  </div>
+</form>
+    </section>
+  </main>
+
+  <!-- JS do formulário -->
+<!-- no fim do <body> -->
+<script src="/painel/js/matriculas.js" defer></script>
+
+</body>
+</html>

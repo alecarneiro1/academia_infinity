@@ -34,27 +34,28 @@ export function renderCTA(contactNumber, label = "Falar com o contato") {
 }
 
 // Decide se a mensagem é do "usuário" ou "agente"
-function who(msg) {
-  if (msg.agentResponse && !msg.userMessage) return "agent";
-  if (msg.userMessage && !msg.agentResponse) return "user";
-  return msg.id % 2 === 0 ? "user" : "agent";
+function whoUser() { return "user"; }
+function whoAgent() { return "agent"; }
+
+// Renderiza uma bolha de mensagem para userMessage
+function renderUserBubble(msg) {
+  if (!msg.userMessage) return "";
+  const hora = fmtHora(msg.time);
+  return `
+    <div class="bubble bubble--user">
+      <div class="bubble__text">${escapeHtml(msg.userMessage)}</div>
+      <div class="bubble__time">${hora}</div>
+    </div>
+  `;
 }
 
-export function renderMessageBubble(msg) {
-  const side = who(msg);
-  const text =
-    side === "agent"
-      ? (msg.agentResponse ?? "")
-      : (msg.userMessage ?? "");
-
+// Renderiza uma bolha de mensagem para agentResponse
+function renderAgentBubble(msg) {
+  if (!msg.agentResponse) return "";
   const hora = fmtHora(msg.time);
-  const name = side === "agent" ? "Bot" : "Você";
-  const alt = side === "agent" ? " alt" : "";
-  const nameClass = side === "agent" ? "name alt" : "name";
-
   return `
-    <div class="bubble bubble--${side}">
-      <div class="bubble__text">${escapeHtml(text)}</div>
+    <div class="bubble bubble--agent">
+      <div class="bubble__text">${escapeHtml(msg.agentResponse)}</div>
       <div class="bubble__time">${hora}</div>
     </div>
   `;
@@ -65,6 +66,7 @@ export function renderDaySeparator(dateStr) {
 }
 
 // Renderiza a lista completa (com separadores de dia)
+// Agora mostra userMessage e agentResponse separadamente
 export function renderChatList(rows) {
   let html = "";
   let lastDay = "";
@@ -76,7 +78,8 @@ export function renderChatList(rows) {
       html += renderDaySeparator(r.time);
       lastDay = day;
     }
-    html += renderMessageBubble(r);
+    html += renderUserBubble(r);
+    html += renderAgentBubble(r);
   }
   return html;
 }
