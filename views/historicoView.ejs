@@ -1,20 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Histórico</title>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+  />
+  <title>Histórico de Chat</title>
+  <link rel="stylesheet" href="/painel/css/main.css" />
 </head>
 <body>
-  <h1>Histórico do contato</h1>
+  <div class="wrap">
+    <!-- Header preenchido pelo JS (renderHeader) -->
+    <div id="chatHeader"></div>
 
-  <div id="chatHeader"></div>
+    <!-- Lista do chat (preenchida pelo JS: renderChatList) -->
+    <main id="chatList" class="chat" aria-live="polite"></main>
 
-  <div id="chatList"></div>
+    <!-- CTA fixo no rodapé (preenchido pelo JS: renderCTA) -->
+    <div id="chatCta" class="cta-area"></div>
+  </div>
 
-  <div id="chatCta"></div>
-
-  <div id="chatError" style="color: red;"></div>
-
+  <!-- JS que busca /api/historico/:phoneAndIds e renderiza a tela -->
   <script type="module" src="/painel/js/historico.js"></script>
+
+
 </body>
 </html>

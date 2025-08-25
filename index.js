@@ -9,7 +9,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Static
-app.use(express.static(path.join(__dirname, "..", "public"))); // ajuste se seu index.js estiver na raiz
+app.use('/painel', express.static(path.join(__dirname, "public"))); // serve static files under /painel
 
 // Rotas
 const interactionsRoutes = require("./routes/interactionsRoutes");
