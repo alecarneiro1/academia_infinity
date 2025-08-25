@@ -96,9 +96,20 @@ input:focus,select:focus,textarea:focus{
 .btn:hover{filter:brightness(1.05)}
 .btn:active{transform:translateY(1px)}
 
+.btn-outline{
+  background:transparent;
+  border:1px solid var(--border);
+  color:#fff;
+}
+.btn-outline:hover{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(214,0,0,.12);
+}
+
 @media (max-width: 720px){
   .grid{grid-template-columns:1fr}
 }
+
 /* prefixo +55 fixo ao lado do input */
 .input-prefix{
   position: relative;
@@ -119,7 +130,7 @@ input:focus,select:focus,textarea:focus{
   flex:1;
 }
 
-/* grupo de checkboxes */
+/* grupo de checkboxes como "cards" */
 .checks{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -131,7 +142,6 @@ input:focus,select:focus,textarea:focus{
   gap:8px;
   font-size:14px;
   color:#d7dbe3;
-  /* novo: aparência de box */
   background: #18181c;
   border: 2px solid var(--border);
   border-radius: 10px;
@@ -143,59 +153,67 @@ input:focus,select:focus,textarea:focus{
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   position: relative;
 }
-
-/* Esconde o checkbox padrão */
-.checks input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Estilo quando selecionado */
-.checks input[type="checkbox"]:checked + span,
-.checks input[type="checkbox"]:checked ~ span {
-  color: #fff;
-}
-
-/* Label destacado quando selecionado */
-.checks input[type="checkbox"]:checked + span,
-.checks input[type="checkbox"]:checked ~ span,
-.checks input[type="checkbox"]:checked {
-  /* nada aqui, só para manter a ordem */
-}
-.checks input[type="checkbox"]:checked ~ label,
-.checks label:has(input[type="checkbox"]:checked) {
+.checks input[type="checkbox"]{ position:absolute; opacity:0; pointer-events:none; }
+.checks label:has(input[type="checkbox"]:checked){
   border-color: var(--accent);
   background: linear-gradient(180deg,rgba(214,0,0,.10),rgba(214,0,0,.18));
   color: #fff;
   box-shadow: 0 4px 16px var(--shadow);
 }
 
-/* Para compatibilidade, também usando :has() para destacar o label */
-.checks label:has(input[type="checkbox"]:checked) {
-  border-color: var(--accent);
-  background: linear-gradient(180deg,rgba(214,0,0,.10),rgba(214,0,0,.18));
-  color: #fff;
-  box-shadow: 0 4px 16px var(--shadow);
-}
-
-/* Remove gap extra do ícone do checkbox */
-.checks label input[type="checkbox"] {
-  display: none;
-}
-
-/* Fieldset e legend mais discretos */
-fieldset {
-  border: none;
-  padding: 0;
-  margin: 0 0 8px 0;
-}
-
-legend {
+/* Fieldset e legend */
+fieldset{ border:none; padding:0; margin:0 0 8px 0; }
+legend{
   font-size: 15px;
   color: #d7dbe3;
   font-weight: 600;
   margin-bottom: 8px;
-  padding: 0;
   letter-spacing: .2px;
+}
+
+/* ===== Modal ===== */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:grid;
+  place-items:center;
+  z-index:1000;
+  opacity:0;
+  transform:scale(1.01);
+  transition:opacity .15s ease, transform .15s ease;
+  pointer-events: none; /* Adicione esta linha */
+}
+.modal-overlay.open{ 
+  opacity:1; 
+  transform:scale(1);
+  pointer-events: auto; /* Adicione esta linha */
+}
+
+.modal{
+  width:min(680px,92vw);
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px 20px 16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5), 0 10px 30px var(--shadow);
+}
+.modal-title{
+  margin:0 0 4px 0;
+  font-size:20px;
+}
+.modal-sub{
+  margin:0 0 14px 0;
+  color:#c9cbd2;
+  font-size:14px;
+}
+.confirm-list{
+  margin:0 0 16px 0;
+  padding:0 0 0 16px;
+  display:grid;
+  gap:6px;
+}
+.confirm-list li{ margin-left:0; }
+.modal-actions{
+  display:flex; justify-content:flex-end; gap:10px;
 }

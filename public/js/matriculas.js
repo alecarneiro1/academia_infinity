@@ -8,45 +8,58 @@
   const cpf = document.getElementById("cpf");
   const dataNascimento = document.getElementById("data_nascimento");
 
+  const nome = document.getElementById("nome_completo");
+  const endereco = document.getElementById("endereco");
+  const plano = document.getElementById("plano");
+  const origem = document.getElementById("origem");
+
+  const objetivosWrap = document.getElementById("objetivos");
+
+  // Modal
+  const overlay = document.getElementById("confirmOverlay");
+  const btnEditar = document.getElementById("btnEditar");
+  const btnConfirmar = document.getElementById("btnConfirmar");
+
+  // Campos da modal
+  const c_nome = document.getElementById("c_nome");
+  const c_endereco = document.getElementById("c_endereco");
+  const c_cep = document.getElementById("c_cep");
+  const c_cpf = document.getElementById("c_cpf");
+  const c_whatsapp = document.getElementById("c_whatsapp");
+  const c_data = document.getElementById("c_data");
+  const c_plano = document.getElementById("c_plano");
+  const c_objetivos = document.getElementById("c_objetivos");
+  const c_origem = document.getElementById("c_origem");
+
   /* ========= Helpers ========= */
   const onlyDigits = (s) => String(s || "").replace(/\D/g, "");
 
-  // WhatsApp – formatação ao digitar:
-  // mostra como (DD) 9156-2180 (parênteses, espaço e hífen automáticos)
+  // WhatsApp – formatação ao digitar: (DD) 9156-2180
   function maskWhatsDisplay(v) {
     let d = onlyDigits(v);
-    // limita DDD+numero a no máx 11 dígitos (incluindo possível 9)
-    d = d.slice(0, 13); // margem
     if (d.startsWith("55")) d = d.slice(2);
+    d = d.slice(0, 10 + 1); // DDD(2) + 9 extra opcional(1) + 8 (total máx 11 dígitos)
 
     const ddd = d.slice(0, 2);
     let local = d.slice(2);
 
-    // Formato visual: (DD) 9156-2180  (4-4)
-    // se tiver mais que 8 no local, corta
+    // Monta 4-4 visual
     local = local.slice(0, 8);
-
     let out = "";
     if (ddd.length) out = `(${ddd}`;
     if (ddd.length === 2) out += `) `;
     if (local.length) {
-      if (local.length <= 4) {
-        out += local;
-      } else {
-        out += `${local.slice(0, 4)}-${local.slice(4)}`;
-      }
+      if (local.length <= 4) out += local;
+      else out += `${local.slice(0, 4)}-${local.slice(4)}`;
     }
     return out;
   }
 
-  // WhatsApp – normalização no submit: 55 + DDD + 8 dígitos
-  // remove '9' extra após DDD, se existir
+  // WhatsApp – normalização para enviar ao backend: 55 + DDD + 8 dígitos (remove 9 extra)
   function normalizeWhatsToE164BR(displayValue) {
     let d = onlyDigits(displayValue);
     if (d.startsWith("55")) d = d.slice(2);
-    // se vier com 11 dígitos (DDD + 9 + 8), remove o 3º
-    if (d.length === 11 && d[2] === "9") d = d.slice(0, 2) + d.slice(3);
-    // garante 10 finais
+    if (d.length === 11 && d[2] === "9") d = d.slice(0, 2) + d.slice(3); // remove 9 logo após DDD
     if (d.length > 10) d = d.slice(-10);
     return d.length === 10 ? "55" + d : null;
   }
@@ -80,64 +93,97 @@
   /* ========= Listeners (máscaras em tempo real) ========= */
   if (waLocal) {
     waLocal.addEventListener("input", () => {
-      const caret = waLocal.selectionStart;
       waLocal.value = maskWhatsDisplay(waLocal.value);
-      // caret simples (suficiente na maioria dos casos)
-      waLocal.setSelectionRange(waLocal.value.length, waLocal.value.length);
     });
   }
-
   if (cep) {
     cep.addEventListener("input", () => {
       cep.value = maskCEP(cep.value);
     });
   }
-
   if (cpf) {
     cpf.addEventListener("input", () => {
       cpf.value = maskCPF(cpf.value);
     });
   }
-
   if (dataNascimento) {
     dataNascimento.addEventListener("input", () => {
       dataNascimento.value = maskDataNascimento(dataNascimento.value);
     });
   }
 
-  /* ========= Submit ========= */
-  let sending = false;
+  /* ========= Modal ========= */
+  function openModal() {
+    overlay.hidden = false;
+    overlay.classList.add("open");
+  }
+  function closeModal() {
+    overlay.classList.remove("open");
+    overlay.hidden = true;
+  }
+
+  /* ========= Submit com confirmação ========= */
+  let confirmedOnce = false;
   form.addEventListener("submit", (e) => {
-    if (sending) { e.preventDefault(); return; }
+    if (confirmedOnce) return; // já confirmado → deixa enviar
 
-    // normaliza WhatsApp para enviar ao n8n no hidden
-    if (waLocal && waHidden) {
-      const norm = normalizeWhatsToE164BR(waLocal.value);
-      if (!norm) {
-        e.preventDefault();
-        alert("WhatsApp inválido. Ex.: (42) 9999-9999");
-        waLocal.focus();
-        return;
-      }
-      waHidden.value = norm; // ex.: 554291562180
+    e.preventDefault();
+
+    // Normaliza WhatsApp (para modal e hidden)
+    const normalizedWa = normalizeWhatsToE164BR(waLocal.value);
+    if (!normalizedWa) {
+      alert("WhatsApp inválido. Ex.: (42) 9999-9999");
+      waLocal.focus();
+      return;
     }
 
-    // normaliza data de nascimento para dd/mm/aaaa
-    if (dataNascimento) {
-      let d = onlyDigits(dataNascimento.value);
-      if (d.length === 8) {
-        const dia = d.slice(0, 2);
-        const mes = d.slice(2, 4);
-        const ano = d.slice(4, 8);
-        dataNascimento.value = `${dia}/${mes}/${ano}`;
-      } else {
-        e.preventDefault();
-        alert("Data de nascimento inválida. Use o formato dd/mm/aaaa.");
-        dataNascimento.focus();
-        return;
-      }
+    // Valida data de nascimento (8 dígitos)
+    let d = onlyDigits(dataNascimento.value);
+    if (d.length !== 8) {
+      alert("Data de nascimento inválida. Use o formato dd/mm/aaaa.");
+      dataNascimento.focus();
+      return;
     }
+    const dia = d.slice(0, 2);
+    const mes = d.slice(2, 4);
+    const ano = d.slice(4, 8);
+    const dataFormatada = `${dia}/${mes}/${ano}`;
 
-    sending = true;
+    // Objetivos selecionados (texto do span)
+    const objetivosSel = Array.from(objetivosWrap.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(chk => chk.value);
+    const objetivosStr = objetivosSel.join(", ");
+
+    // Preenche modal
+    c_nome.textContent = nome.value.trim();
+    c_endereco.textContent = endereco.value.trim();
+    c_cep.textContent = cep.value.trim();
+    c_cpf.textContent = cpf.value.trim();
+    c_whatsapp.textContent = `+${normalizedWa.slice(0,2)} (${normalizedWa.slice(2,4)}) ${normalizedWa.slice(4,8)}-${normalizedWa.slice(8)}`; // +55 (DD) 9999-9999
+    c_data.textContent = dataFormatada;
+    c_plano.textContent = plano.value;
+    c_objetivos.textContent = objetivosStr || "—";
+    c_origem.textContent = (origem.value || "—").trim();
+
+    openModal();
+
+    // Botões da modal
+    btnEditar.onclick = () => {
+      closeModal();
+    };
+    btnConfirmar.onclick = () => {
+      // grava hidden do whatsapp e normaliza data (dd/mm/aaaa)
+      waHidden.value = normalizedWa;
+      dataNascimento.value = dataFormatada;
+
+      confirmedOnce = true;
+      closeModal();
+      form.submit(); // envia de verdade
+    };
+  });
+
+  // Fecha modal clicando fora
+  overlay?.addEventListener("click", (ev) => {
+    if (ev.target === overlay) closeModal();
   });
 })();
