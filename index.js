@@ -9,7 +9,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Static
-app.use("/painel", express.static(path.join(__dirname, "public")));
+app.use("/painel", express.static(__dirname + "/public"));
 
 // (Opcional) parsers - não são obrigatórios na Opção A,
 // mas não atrapalham e ajudam em outras rotas
@@ -22,7 +22,9 @@ app.use("/", interactionsRoutes);
 
 // Novas rotas de matrícula (somente GETs; POST vai direto ao n8n)
 const matriculasRoutes = require("./routes/matriculasRoutes");
+const listamatriculasRoutes = require("./routes/listamatriculasRoutes"); // novo
 app.use("/", matriculasRoutes);
+app.use("/", listamatriculasRoutes); // novo
 
 // Home (exemplo)
 app.get("/", (_, res) => res.redirect("/historico/554291562180-1,2,3"));
