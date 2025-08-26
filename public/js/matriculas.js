@@ -136,6 +136,33 @@
     successOverlay.hidden = true;
   }
 
+  // === Detecta número na URL e preenche WhatsApp se existir ===
+  function getWhatsFromUrl() {
+    // Exemplo de path: /matriculas/554291562180
+    const pathParts = window.location.pathname.split("/");
+    const last = pathParts[pathParts.length - 1];
+    // Verifica se é um número de 12 dígitos (ex: 55 + DDD + 8 ou 9 dígitos)
+    if (/^55\d{10,11}$/.test(last)) {
+      return last;
+    }
+    return null;
+  }
+
+  const waFromUrl = getWhatsFromUrl();
+  if (waFromUrl && waLocal && waHidden) {
+    // Formata para exibição
+    let display = waFromUrl;
+    if (display.startsWith("55")) display = display.slice(2);
+    // Se for 11 dígitos e começar com 9, remove o 9 para exibir corretamente
+    if (display.length === 11 && display[2] === "9") display = display.slice(0,2) + display.slice(3);
+    waLocal.value = maskWhatsDisplay(display);
+    waLocal.disabled = true;
+    waLocal.style.background = "#222225";
+    waLocal.style.cursor = "not-allowed";
+    // Preenche também o hidden já normalizado
+    waHidden.value = waFromUrl;
+  }
+
   /* ========= Submit com confirmação ========= */
   let confirmedOnce = false;
   form.addEventListener("submit", (e) => {
@@ -143,12 +170,17 @@
 
     e.preventDefault();
 
-    // Normaliza WhatsApp (para modal e hidden)
-    const normalizedWa = normalizeWhatsToE164BR(waLocal.value);
-    if (!normalizedWa) {
-      alert("WhatsApp inválido. Ex.: (42) 9999-9999");
-      waLocal.focus();
-      return;
+    // Se o campo foi preenchido pela URL, não sobrescreve
+    let normalizedWa;
+    if (waFromUrl) {
+      normalizedWa = waFromUrl;
+    } else {
+      normalizedWa = normalizeWhatsToE164BR(waLocal.value);
+      if (!normalizedWa) {
+        alert("WhatsApp inválido. Ex.: (42) 9999-9999");
+        waLocal.focus();
+        return;
+      }
     }
 
     // Valida data de nascimento (8 dígitos)
@@ -173,7 +205,7 @@
     c_endereco.textContent = endereco.value.trim();
     c_cep.textContent = cep.value.trim();
     c_cpf.textContent = cpf.value.trim();
-    c_whatsapp.textContent = `+${normalizedWa.slice(0,2)} (${normalizedWa.slice(2,4)}) ${normalizedWa.slice(4,8)}-${normalizedWa.slice(8)}`; // +55 (DD) 9999-9999
+    c_whatsapp.textContent = `+${normalizedWa.slice(0,2)} (${normalizedWa.slice(2,4)}) ${normalizedWa.slice(4,8)}-${normalizedWa.slice(8)}`;
     c_data.textContent = dataFormatada;
     c_plano.textContent = plano.value;
     c_objetivos.textContent = objetivosStr || "—";
