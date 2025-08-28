@@ -10,7 +10,7 @@ const Summary = sequelize.define("Summary", {
   end_time: { type: DataTypes.TIME, allowNull: true },
   duration_minutes: { type: DataTypes.INTEGER, allowNull: true },
   summary: { type: DataTypes.TEXT, allowNull: true },
-  history_url: { type: DataTypes.TEXT, allowNull: true },
+  chatid: { type: DataTypes.ARRAY(DataTypes.TEXT), allowNull: true }, // ✅ novo campo
   created_at: {
     type: DataTypes.DATE,
     allowNull: true,
@@ -21,5 +21,6 @@ const Summary = sequelize.define("Summary", {
   tableName: "summaries",
   timestamps: false,
 });
+
 
 module.exports = Summary;

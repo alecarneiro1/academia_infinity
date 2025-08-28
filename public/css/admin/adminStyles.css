@@ -103,6 +103,8 @@ a:hover{ color: #ff3b64; }
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1), box-shadow 0.3s;
+  z-index: 100;
 }
 .brand{
   display:flex; align-items:center; gap:.75rem; padding:.5rem .25rem;
@@ -175,9 +177,10 @@ a:hover{ color: #ff3b64; }
 .h2{ font-size: var(--fs-xl); margin: 1.2rem 0 .6rem; }
 
 /* Grid helpers */
-.grid{ display: grid; gap: 1rem; }
+.grid{ display: grid; gap: 1.2rem; }   /* antes era 1rem */
 .grid--4{ grid-template-columns: repeat(4, 1fr); }
 .grid--2{ grid-template-columns: repeat(2, 1fr); }
+.grid--1 { grid-template-columns: 1fr; }
 @media (max-width: 1100px){ .grid--4{ grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 680px){ .grid--4,.grid--2{ grid-template-columns: 1fr; } }
 
@@ -188,6 +191,7 @@ a:hover{ color: #ff3b64; }
   border-radius: var(--radius);
   box-shadow: var(--shadow-1);
   padding: 1rem;
+  margin-bottom: 1.2rem;   /* NOVO: garante espaçamento vertical mesmo fora de grid */
 }
 .card__title{ font-weight:700; margin-bottom:.25rem; }
 .card__sub{ color: var(--muted); font-size: var(--fs-sm); margin-bottom: .5rem; }
@@ -208,12 +212,19 @@ a:hover{ color: #ff3b64; }
 }
 
 /* Legend + chart placeholder */
-.chart{ height: 260px; display:grid; place-items:center; border:1px dashed var(--border); border-radius: var(--radius); }
+.chart{ height: 260px; display:grid; place-items:center; border:1px dashed var(--border); border-radius: var(--radius); width: 100%; }
 .chart__placeholder{ color: var(--muted); font-family: var(--mono); font-size: var(--fs-sm); }
 .legend{ display:flex; gap:1rem; flex-wrap:wrap; margin-top:.75rem; }
 .dot{ width:10px; height:10px; border-radius:999px; background: var(--red); display:inline-block; margin-right:.35rem; }
 .dot--alt{ background: var(--blue); }
 .dot--muted{ background: #475569; }
+.chart canvas {
+  width: 100% !important;
+  height: 258px !important;
+  max-width: 100%;
+  display: block;
+  box-sizing: border-box;
+}
 
 /* Buttons */
 .btn{
@@ -324,4 +335,62 @@ a:hover{ color: #ff3b64; }
 /* Transitions preference */
 @media (prefers-reduced-motion: reduce){
   *{ transition:none !important; animation:none !important; }
+}
+
+/* Sidebar responsiva */
+.sidebar {
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1), box-shadow 0.3s;
+  z-index: 100;
+}
+
+@media (max-width: 960px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100dvh;
+    transform: translateX(-100%);
+    box-shadow: none;
+    width: 80vw;
+    max-width: 320px;
+    min-width: 220px;
+  }
+  .sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 0 0 0 100vw rgba(0,0,0,0.35);
+  }
+  .sidebar__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 99;
+    animation: fadeIn .2s;
+  }
+}
+
+@media (max-width: 960px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Esconde o backdrop por padrão */
+.sidebar__backdrop {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Ajuste para o botão do menu (hamburger) ficar visível apenas em mobile */
+.btn-sidebar-toggle {
+  display: none;
+}
+@media (max-width: 960px) {
+  .btn-sidebar-toggle {
+    display: inline-flex;
+  }
 }
