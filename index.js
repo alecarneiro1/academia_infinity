@@ -17,22 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ──────────────────────────────────────────────────────────
-// Sessão (usa MemoryStore por simplicidade; troque por Redis em prod)
-// ──────────────────────────────────────────────────────────
-const TWO_WEEKS = 1000 * 60 * 60 * 24 * 14;
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "dev-secret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: TWO_WEEKS,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    },
-  })
-);
 
 // ──────────────────────────────────────────────────────────
 // Locals para injeção de CSS/JS por página + título
@@ -48,16 +32,14 @@ app.use((req, res, next) => {
 // ──────────────────────────────────────────────────────────
 // Rotas
 // ──────────────────────────────────────────────────────────
-app.use(require("./routes/adminAuthRoutes"));       // login/logout
+// app.use(require("./routes/adminAuthRoutes"));       // login/logout
 app.use(require("./routes/adminDashboardRoutes"));  // dashboard admin
 
 
 // redirect raiz → login ou dashboard
 app.get("/", (req, res) => {
-  if (req.session?.adminAuth && req.session.adminAuthExpires > Date.now()) {
-    return res.redirect("/admin/dashboard");
-  }
-  return res.redirect("/admin/login");
+  // Redirecione sempre para o dashboard, sem checar autenticação
+  return res.redirect("/admin/dashboard");
 });
 
 // 404

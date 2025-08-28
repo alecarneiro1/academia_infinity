@@ -1,11 +1,15 @@
 <%- include('./partials/head', { title, styles }) %>
 <body>
-  <%- include('./partials/header') %>
-  <main class="dashboard-main">
-    <h1>Bem-vindo ao Dashboard Admin</h1>
-    <p>Você está autenticado como administrador.</p>
-  </main>
+  <div class="app">
+    <%- include('./partials/sidebar') %>
+    <main class="main">
+      <%- include('./partials/header') %>
+      
+      <div class="container">
+        <h1>Dashboard</h1>
+
+      </div>
+    </main>
+  </div>
   <%- include('./partials/scripts', { scripts }) %>
 </body>
-   asdfasdf
-<%- include('partials/scripts', { scripts }) %>
