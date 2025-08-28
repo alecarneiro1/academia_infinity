@@ -1,4 +1,5 @@
 const kpiDashboardModel = require('../../models/kpiDashboardModel');
+const metricsModel = require('../../models/metricsModel');
 
 exports.getDashboard = async (req, res) => {
     try {
@@ -18,3 +19,12 @@ exports.getDashboard = async (req, res) => {
     }
 };
 
+exports.getDailyMessages = async (req, res, next) => {
+    try {
+        const ndays = Number(req.query.days || 10);
+        const rows = await metricsModel.getDailyMessageCounts(ndays);
+        res.json(rows);
+    } catch (err) {
+        next(err);
+    }
+};

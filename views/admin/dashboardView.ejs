@@ -68,7 +68,7 @@
         <!-- Content split -->
         <div class="grid grid--1">
           <article class="card">
-            <div class="card__title">Mensagens recebidas no mês</div>
+            <div class="card__title">Mensagens recebidas nos últimos 10 dias</div>
             <div class="card__sub">Distribuição diária</div>
             <div class="chart">
               <canvas id="messagesChart" height="258"></canvas>
@@ -151,62 +151,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    // Mockup de dados para 30 dias do mês
-    const days = Array.from({length: 30}, (_, i) => (i + 1).toString().padStart(2, '0'));
-    const messages = [
-      120, 98, 110, 130, 125, 140, 150, 160, 170, 180,
-      175, 160, 155, 150, 145, 140, 135, 130, 125, 120,
-      115, 110, 108, 112, 118, 125, 130, 140, 150, 160
-    ];
-
-    const ctx = document.getElementById('messagesChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: days,
-        datasets: [{
-          label: 'Mensagens',
-          data: messages,
-          backgroundColor: 'rgba(225,29,72,0.7)',
-          borderColor: 'rgba(225,29,72,1)',
-          borderWidth: 2,
-          borderRadius: 6,
-          maxBarThickness: 18,
-          categoryPercentage: 0.9,
-          barPercentage: 0.9,
-        }]
-      },
-      options: {
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: '#151923',
-            titleColor: '#e11d48',
-            bodyColor: '#e7e9ee',
-            borderColor: 'rgba(225,29,72,0.5)',
-            borderWidth: 1,
-          }
-        },
-        scales: {
-          x: {
-            grid: { display: false },
-            ticks: { color: '#e7e9ee', font: { family: "'Inter', 'Segoe UI', Arial, sans-serif" } }
-          },
-          y: {
-            grid: { color: 'rgba(225,29,72,0.08)' },
-            ticks: { color: '#e7e9ee', font: { family: "'Inter', 'Segoe UI', Arial, sans-serif" } },
-            beginAtZero: true
-          }
-        }
-      }
-    });
-  </script>
-</body>
-</html>
-        }
-      }
-    });
-  </script>
+  <script src="/js/admin/dashboardScripts.js"></script>
 </body>
 </html>
