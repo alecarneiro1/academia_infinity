@@ -135,9 +135,11 @@ a:hover{ color: #ff3b64; }
 /* Ícones (placeholder com fontes/emoji) */
 .i{ font-style: normal; width:1.2rem; display:inline-grid; place-items:center; }
 .i-dashboard::before{ content:"📊"; }
-.i-analytics::before{ content:"📈"; }
-.i-users::before{ content:"👥"; }
-.i-settings::before{ content:"⚙️"; }
+.i-agent::before { content: "🤖"; }
+.i-messages::before { content: "💬"; }
+.i-contacts::before { content: "👥"; }
+.i-support::before { content: "🛠️"; }
+.i-forms::before { content: "📄"; }
 .i-bell::before{ content:"🔔"; }
 .i-plus::before{ content:"＋"; }
 .i-menu::before{ content:"☰"; }

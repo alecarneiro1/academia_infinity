@@ -1,6 +1,7 @@
 // src/models/summaryModel.js
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
+const Contact = require("./contactModel");
 
 const Summary = sequelize.define("Summary", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true, allowNull: false },
@@ -22,5 +23,6 @@ const Summary = sequelize.define("Summary", {
   timestamps: false,
 });
 
+Summary.belongsTo(Contact, { foreignKey: 'contact', as: 'contactInfo' });
 
 module.exports = Summary;

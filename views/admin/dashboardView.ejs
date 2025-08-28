@@ -22,7 +22,6 @@
         <div class="page-head">
           <div>
             <h1 class="h1">Visão Geral</h1>
-            <p class="muted">Resumo do desempenho nas últimas 24h</p>
           </div>
           <div class="actions">
             <button class="btn btn--primary">Novo Relatório</button>
@@ -94,51 +93,25 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>#10021</td>
-                  <td>Plano Mensal</td>
-                  <td>Lucas Silva</td>
-                  <td>01/08/2025</td>
-                  <td>
-                    <button class="btn btn--xs btn--outline">Ver conversa</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#10020</td>
-                  <td>Avaliação Física</td>
-                  <td>Mariana Costa</td>
-                  <td>31/07/2025</td>
-                  <td>
-                    <button class="btn btn--xs btn--outline">Ver conversa</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#10019</td>
-                  <td>Cancelamento</td>
-                  <td>Rafael Souza</td>
-                  <td>30/07/2025</td>
-                  <td>
-                    <button class="btn btn--xs btn--outline">Ver conversa</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#10018</td>
-                  <td>Horários de Aula</td>
-                  <td>Ana Paula</td>
-                  <td>29/07/2025</td>
-                  <td>
-                    <button class="btn btn--xs btn--outline">Ver conversa</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#10017</td>
-                  <td>Promoção Anual</td>
-                  <td>Felipe Lima</td>
-                  <td>28/07/2025</td>
-                  <td>
-                    <button class="btn btn--xs btn--outline">Ver conversa</button>
-                  </td>
-                </tr>
+                <% if (atendimentos && atendimentos.length > 0) { %>
+                  <% atendimentos.forEach(a => { %>
+                    <tr>
+                      <td>#<%= a.id %></td>
+                      <td><%= a.assunto %></td>
+                      <td><%= a.contato %></td>
+                      <td>
+                        <%= a.data ? new Date(a.data).toLocaleDateString('pt-BR') : '-' %>
+                      </td>
+                      <td>
+                        <button class="btn btn--xs btn--outline">Ver conversa</button>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="5" class="muted" style="text-align:center;">Nenhum atendimento encontrado</td>
+                  </tr>
+                <% } %>
               </tbody>
             </table>
           </div>
