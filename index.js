@@ -4,8 +4,16 @@ const express = require("express");
 const session = require("express-session");
 
 const app = express();
+
+// Body parser deve vir ANTES das rotas!
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 const dashboardRoutes = require('./routes/admin/dashboardRoutes');
 app.use('/admin', dashboardRoutes);
+
+const agenteRoutes = require('./routes/admin/agenteRoutes');
+app.use('/admin', agenteRoutes);
 
 // ──────────────────────────────────────────────────────────
 // Básico do Express
@@ -15,8 +23,6 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.locals.basedir = app.get('views');
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // 404

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Editar Informações da Academia</title>
+  <link rel="stylesheet" href="/css/admin/adminStyles.css" />
+  <script src="/js/admin/agenteScripts.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <%- include('./partials/sidebarPartialView') %>
+
+    <!-- Main -->
+    <main class="main">
+      <!-- Topbar -->
+      <%- include('./partials/topbarPartialView') %>
+
+      <section class="container">
+        <h1 class="h1">Agente</h1>
+        <div class="grid grid--1">
+          <% 
+            // Mapeamento dos títulos corretos pelo id ou pelo título antigo
+            const titleMap = {
+              planos: 'Planos',
+              'personal-trainer': 'Personal Trainer',
+              links: 'Links',
+              localizacao: 'Localização',
+              promocoes: 'Promoções',
+              horarios: 'Horários'
+            };
+          %>
+          <% infos.forEach(info => { %>
+            <form class="card" method="POST" action="/admin/agente/<%= info.id %>">
+              <div class="card__title">
+                <%= titleMap[info.titulo.trim().toLowerCase()] || info.titulo %>
+              </div>
+              <div class="field field--col2">
+                <textarea class="textarea" name="conteudo" rows="6"><%= info.conteudo %></textarea>
+              </div>
+              <div class="form__actions">
+                <button class="btn btn--primary" type="submit">Salvar</button>
+              </div>
+            </form>
+          <% }) %>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

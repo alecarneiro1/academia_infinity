@@ -3,7 +3,7 @@ const metricsModel = require('../../models/metricsModel');
 const Summary = require('../../models/summaryModel');
 const Contact = require('../../models/contactModel');
 
-exports.getDashboard = async (req, res) => {
+async function getDashboard(req, res) {
     try {
         const kpis = await kpiDashboardModel.getDashboardKpis();
 
@@ -18,7 +18,6 @@ exports.getDashboard = async (req, res) => {
             }]
         });
 
-        // Ajuste para garantir que o nome do contato aparece mesmo se não houver join
         const atendimentos = summaries.map(s => ({
             id: s.id,
             assunto: s.subject,
@@ -34,15 +33,16 @@ exports.getDashboard = async (req, res) => {
                 total_matriculas: kpis.total_matriculas
             } : null,
             atendimentos,
+            activePath: req.baseUrl + req.path, // Adicione esta linha
             error: (!kpis ? 'Nenhum dado retornado da view v_kpidashboard.' : null)
         });
     } catch (err) {
         console.error('Erro ao buscar KPIs:', err);
-        res.render('admin/dashboardView', { kpis: null, atendimentos: [], error: err.message || 'Erro ao buscar KPIs' });
+        res.render('admin/dashboardView', { kpis: null, atendimentos: [], error: err.message || 'Erro ao buscar KPIs', activePath: req.baseUrl + req.path });
     }
-};
+}
 
-exports.getDailyMessages = async (req, res, next) => {
+async function getDailyMessages(req, res, next) {
     try {
         const ndays = Number(req.query.days || 10);
         const rows = await metricsModel.getDailyMessageCounts(ndays);
@@ -50,4 +50,9 @@ exports.getDailyMessages = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+}
+
+module.exports = {
+    getDashboard,
+    getDailyMessages
 };
