@@ -4,6 +4,7 @@ const express = require("express");
 const session = require("express-session");
 
 const app = express();
+const dashboardRoutes = require('./routes/admin/dashboardRoutes');
 
 // ──────────────────────────────────────────────────────────
 // Básico do Express
@@ -16,7 +17,7 @@ app.locals.basedir = app.get('views');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
-
+app.use('/admin', dashboardRoutes);
 
 
 // 404

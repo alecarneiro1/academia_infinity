@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard • Tema Dark Vermelho</title>
+  <link rel="stylesheet" href="/css/admin/dashboardStyles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand__logo">▲</span>
+        <span class="brand__name">RedDash</span>
+      </div>
+      <nav class="nav">
+        <a class="nav__link is-active" href="#"><i class="i i-dashboard"></i> Dashboard</a>
+        <a class="nav__link" href="#"><i class="i i-analytics"></i> Analytics</a>
+        <a class="nav__link" href="#"><i class="i i-users"></i> Usuários</a>
+        <a class="nav__link" href="#"><i class="i i-settings"></i> Configurações</a>
+      </nav>
+      <div class="sidebar__footer">
+        <button class="btn btn--ghost btn--sm">Sair</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar__left">
+          <button class="btn btn--ghost btn--icon" aria-label="Abrir menu">
+            <span class="i i-menu"></span>
+          </button>
+          <div class="search">
+            <input class="input input--search" placeholder="Buscar..." aria-label="Buscar" />
+          </div>
+        </div>
+        <div class="topbar__right">
+          <button class="btn btn--ghost btn--icon" aria-label="Notificações">
+            <span class="badge badge--dot"></span>
+            <span class="i i-bell"></span>
+          </button>
+          <div class="avatar">AC</div>
+        </div>
+      </header>
+
+      <section class="container">
+        <!-- Page header -->
+        <div class="page-head">
+          <div>
+            <h1 class="h1">Visão Geral</h1>
+            <p class="muted">Resumo do desempenho nas últimas 24h</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn--primary">Novo Relatório</button>
+            <button class="btn btn--outline">Exportar</button>
+          </div>
+        </div>
+
+        <!-- KPI cards -->
+        <div class="grid grid--4">
+          <article class="card kpi">
+            <div class="card__head">
+              <span class="muted">Receita</span>
+              <span class="badge badge--success">+8.4%</span>
+            </div>
+            <div class="kpi__value">R$ 128.9k</div>
+            <div class="progress"><div class="progress__bar" style="width:72%"></div></div>
+          </article>
+
+          <article class="card kpi">
+            <div class="card__head">
+              <span class="muted">Pedidos</span>
+              <span class="badge badge--warning">-3.2%</span>
+            </div>
+            <div class="kpi__value">2.431</div>
+            <div class="progress"><div class="progress__bar" style="width:52%"></div></div>
+          </article>
+
+          <article class="card kpi">
+            <div class="card__head">
+              <span class="muted">Conversão</span>
+              <span class="badge badge--neutral">2.1%</span>
+            </div>
+            <div class="kpi__value">2,1%</div>
+            <div class="progress"><div class="progress__bar" style="width:21%"></div></div>
+          </article>
+
+          <article class="card kpi">
+            <div class="card__head">
+              <span class="muted">Assinantes</span>
+              <span class="badge badge--success">+412</span>
+            </div>
+            <div class="kpi__value">18.204</div>
+            <div class="progress"><div class="progress__bar" style="width:80%"></div></div>
+          </article>
+        </div>
+
+        <!-- Content split -->
+        <div class="grid grid--2">
+          <article class="card">
+            <div class="card__title">Tráfego por canal</div>
+            <div class="card__sub">Últimos 7 dias</div>
+            <!-- Placeholder de gráfico -->
+            <div class="chart">
+              <div class="chart__placeholder">Gráfico (coloque aqui o canvas do chart lib)</div>
+            </div>
+            <div class="legend">
+              <span class="legend__item"><span class="dot"></span> Orgânico</span>
+              <span class="legend__item"><span class="dot dot--alt"></span> Pago</span>
+              <span class="legend__item"><span class="dot dot--muted"></span> Referral</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__title">Criar campanha</div>
+            <div class="form form--grid">
+              <label class="field">
+                <span class="label">Nome</span>
+                <input class="input" placeholder="Ex.: Promo Set/25" />
+              </label>
+              <label class="field">
+                <span class="label">Orçamento</span>
+                <div class="input-group">
+                  <span class="input-group__addon">R$</span>
+                  <input class="input" type="number" min="0" step="0.01" placeholder="0,00" />
+                </div>
+              </label>
+              <label class="field">
+                <span class="label">Canal</span>
+                <select class="select">
+                  <option>Google Ads</option>
+                  <option>Meta Ads</option>
+                  <option>Email</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="label">Início</span>
+                <input class="input" type="date" />
+              </label>
+              <label class="field field--col2">
+                <span class="label">Descrição</span>
+                <textarea class="textarea" rows="4" placeholder="Objetivo, público, criativos..."></textarea>
+              </label>
+              <div class="form__actions">
+                <button class="btn btn--primary">Salvar</button>
+                <button class="btn btn--ghost">Cancelar</button>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Table -->
+        <article class="card">
+          <div class="card__title">Pedidos recentes</div>
+          <div class="table table--responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Cliente</th>
+                  <th>Status</th>
+                  <th>Valor</th>
+                  <th>Data</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#92831</td>
+                  <td>Maria Souza</td>
+                  <td><span class="badge badge--success">Pago</span></td>
+                  <td>R$ 1.280,00</td>
+                  <td>27/08/2025</td>
+                  <td>
+                    <button class="btn btn--xs btn--outline">Ver</button>
+                    <button class="btn btn--xs btn--ghost">Reembolsar</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>#92830</td>
+                  <td>João Lima</td>
+                  <td><span class="badge badge--warning">Pendente</span></td>
+                  <td>R$ 349,90</td>
+                  <td>27/08/2025</td>
+                  <td>
+                    <button class="btn btn--xs btn--outline">Ver</button>
+                    <button class="btn btn--xs btn--ghost">Cancelar</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>#92829</td>
+                  <td>Ana Clara</td>
+                  <td><span class="badge badge--danger">Falhou</span></td>
+                  <td>R$ 199,00</td>
+                  <td>26/08/2025</td>
+                  <td>
+                    <button class="btn btn--xs btn--outline">Tentar novamente</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- Components gallery -->
+        <section class="gallery">
+          <h2 class="h2">Componentes</h2>
+          <div class="stack">
+            <div class="stack__row">
+              <button class="btn btn--primary">Primário</button>
+              <button class="btn btn--outline">Outline</button>
+              <button class="btn btn--ghost">Ghost</button>
+              <button class="btn btn--danger">Perigo</button>
+              <button class="btn btn--icon"><span class="i i-plus"></span></button>
+            </div>
+            <div class="stack__row">
+              <span class="badge">Neutro</span>
+              <span class="badge badge--success">Success</span>
+              <span class="badge badge--warning">Warning</span>
+              <span class="badge badge--danger">Danger</span>
+            </div>
+            <div class="stack__row">
+              <input class="input" placeholder="Input padrão" />
+              <select class="select"><option>Seleção</option></select>
+              <div class="checkbox">
+                <input id="chk1" type="checkbox" />
+                <label for="chk1">Checkbox</label>
+              </div>
+              <div class="radio">
+                <input id="rd1" name="r" type="radio" />
+                <label for="rd1">Radio</label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Footer muted -->
+        <footer class="muted small mt-8">
+          Feito com <span class="red">❤</span> – Tema Dark Red
+        </footer>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
