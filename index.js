@@ -18,29 +18,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 
-// ──────────────────────────────────────────────────────────
-// Locals para injeção de CSS/JS por página + título
-// (assim você não precisa passar sempre; o que a rota enviar sobrescreve)
-// ──────────────────────────────────────────────────────────
-app.use((req, res, next) => {
-  res.locals.title = "Painel";
-  res.locals.styles = [];   // ex.: ["/css/admin/dashboard.css"]
-  res.locals.scripts = [];  // ex.: ["/js/admin/dashboard.js"]
-  next();
-});
-
-// ──────────────────────────────────────────────────────────
-// Rotas
-// ──────────────────────────────────────────────────────────
-// app.use(require("./routes/adminAuthRoutes"));       // login/logout
-app.use(require("./routes/adminDashboardRoutes"));  // dashboard admin
-
-
-// redirect raiz → login ou dashboard
-app.get("/", (req, res) => {
-  // Redirecione sempre para o dashboard, sem checar autenticação
-  return res.redirect("/admin/dashboard");
-});
 
 // 404
 app.use((req, res) => res.status(404).send("Rota não encontrada"));
