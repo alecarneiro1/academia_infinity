@@ -30,38 +30,38 @@
           </div>
         </div>
 
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div style="color:#e11d48; font-weight:bold; margin-bottom:1rem;"><%= error %></div>
+        <% } %>
+
         <!-- KPI cards -->
         <div class="grid grid--4">
           <article class="card kpi">
             <div class="card__head">
               <span class="muted">Mensagens</span>
-              <span class="badge badge--success">+8.4%</span>
             </div>
-            <div class="kpi__value">6.124</div>
+            <div class="kpi__value"><%= (kpis && typeof kpis.total_mensages !== 'undefined') ? kpis.total_mensages : '-' %></div>
           </article>
 
           <article class="card kpi">
             <div class="card__head">
               <span class="muted">Contatos</span>
-              <span class="badge badge--warning">-3.2%</span>
             </div>
-            <div class="kpi__value">135</div>
+            <div class="kpi__value"><%= (kpis && typeof kpis.total_contacts !== 'undefined') ? kpis.total_contacts : '-' %></div>
           </article>
 
           <article class="card kpi">
             <div class="card__head">
               <span class="muted">Atendimentos</span>
-              <span class="badge badge--neutral">2.1%</span>
             </div>
-            <div class="kpi__value">1.965</div>
+            <div class="kpi__value"><%= (kpis && typeof kpis.total_summaries !== 'undefined') ? kpis.total_summaries : '-' %></div>
           </article>
 
           <article class="card kpi">
             <div class="card__head">
               <span class="muted">Matrículas</span>
-              <span class="badge badge--success">+412</span>
             </div>
-            <div class="kpi__value">92</div>
+            <div class="kpi__value"><%= (kpis && typeof kpis.total_matriculas !== 'undefined') ? kpis.total_matriculas : '-' %></div>
           </article>
         </div>
 
@@ -198,6 +198,12 @@
             ticks: { color: '#e7e9ee', font: { family: "'Inter', 'Segoe UI', Arial, sans-serif" } },
             beginAtZero: true
           }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
         }
       }
     });
