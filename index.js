@@ -1,34 +1,70 @@
 require("dotenv").config();
 const path = require("path");
 const express = require("express");
-const app = express();
-const PORT = process.env.PORT || 3000;
+const session = require("express-session");
 
-// EJS
+const app = express();
+
+// ──────────────────────────────────────────────────────────
+// Básico do Express
+// ──────────────────────────────────────────────────────────
+app.set("trust proxy", 1);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.locals.basedir = app.get('views');
 
-// Static
-app.use("/painel", express.static(__dirname + "/public"));
-
-// (Opcional) parsers - não são obrigatórios na Opção A,
-// mas não atrapalham e ajudam em outras rotas
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
-// Rotas existentes
-const interactionsRoutes = require("./routes/interactionsRoutes");
-app.use("/", interactionsRoutes);
+// ──────────────────────────────────────────────────────────
+// Sessão (usa MemoryStore por simplicidade; troque por Redis em prod)
+// ──────────────────────────────────────────────────────────
+const TWO_WEEKS = 1000 * 60 * 60 * 24 * 14;
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "dev-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: TWO_WEEKS,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    },
+  })
+);
 
-// Novas rotas de matrícula (somente GETs; POST vai direto ao n8n)
-const matriculasRoutes = require("./routes/matriculasRoutes");
-const listamatriculasRoutes = require("./routes/listamatriculasRoutes"); // novo
-app.use("/", matriculasRoutes);
-app.use("/", listamatriculasRoutes); // novo
-
-// Home (exemplo)
-app.get("/", (_, res) => res.redirect("/historico/554291562180-1,2,3"));
-
-app.listen(PORT, () => {
-  console.log(`🚀 Painel rodando na porta ${PORT}`);
+// ──────────────────────────────────────────────────────────
+// Locals para injeção de CSS/JS por página + título
+// (assim você não precisa passar sempre; o que a rota enviar sobrescreve)
+// ──────────────────────────────────────────────────────────
+app.use((req, res, next) => {
+  res.locals.title = "Painel";
+  res.locals.styles = [];   // ex.: ["/css/admin/dashboard.css"]
+  res.locals.scripts = [];  // ex.: ["/js/admin/dashboard.js"]
+  next();
 });
+
+// ──────────────────────────────────────────────────────────
+// Rotas
+// ──────────────────────────────────────────────────────────
+app.use(require("./routes/adminAuthRoutes"));       // login/logout
+app.use(require("./routes/adminDashboardRoutes"));  // dashboard admin
+
+
+// redirect raiz → login ou dashboard
+app.get("/", (req, res) => {
+  if (req.session?.adminAuth && req.session.adminAuthExpires > Date.now()) {
+    return res.redirect("/admin/dashboard");
+  }
+  return res.redirect("/admin/login");
+});
+
+// 404
+app.use((req, res) => res.status(404).send("Rota não encontrada"));
+
+// start
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () =>
+  console.log(`Servidor rodando em http://localhost:${PORT}`)
+);

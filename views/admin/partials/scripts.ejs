@@ -1,0 +1,9 @@
+<!-- JS base do admin -->
+<script src="/js/admin/main-adminScripts.js"></script>
+<% if (scripts && scripts.length) { %>
+  <% scripts.forEach(function(script) { %>
+    <script src="<%= script %>"></script>
+  <% }); %>
+<% } %>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<%- include('./partials/head', { title: 'Login - Admin', styles }) %>
+<body>
+  <main class="login-wrap">
+    <section class="login-card">
+      <h1>Painel Admin</h1>
+
+      <% if (blocked) { %>
+        <div class="alert alert-danger">Acesso bloqueado por excesso de tentativas.</div>
+      <% } else if (error) { %>
+        <div class="alert alert-warning"><%= error %></div>
+      <% } %>
+
+      <form method="POST" action="/admin/login" id="loginForm">
+        <label>
+          <span>Usuário</span>
+          <input type="text" name="login" autofocus required />
+        </label>
+
+        <label>
+          <span>Senha</span>
+          <input type="password" name="senha" required />
+        </label>
+
+        <button type="submit" class="btn">Entrar</button>
+      </form>
+
+      <p class="muted">Dica: defina <code>ADMINLOGIN</code> e <code>ADMINPASS</code> no .env</p>
+    </section>
+  </main>
+  <%- include('./partials/scripts', { scripts }) %>
+</body>
