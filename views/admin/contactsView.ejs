@@ -31,7 +31,7 @@
                   </a>
                   <a
                     class="btn btn--outline"
-                    style="width:100%;justify-content:center;<%= !c.matriculaId ? 'pointer-events:none;opacity:.5;' : '' %>"
+                    style="<%= 'width:100%;justify-content:center;' + (!c.matriculaId ? 'pointer-events:none;opacity:.5;' : '') %>"
                     href="<%= c.matriculaId ? `/admin/matricula/${c.matriculaId}` : '#' %>"
                     <%= !c.matriculaId ? 'tabindex="-1" aria-disabled="true"' : '' %>
                   >
@@ -39,7 +39,7 @@
                   </a>
                   <a
                     class="btn btn--outline"
-                    style="width:100%;justify-content:center;<%= !c.atendimentoIds.length ? 'pointer-events:none;opacity:.5;' : '' %>"
+                    style="<%= 'width:100%;justify-content:center;' + (!c.atendimentoIds.length ? 'pointer-events:none;opacity:.5;' : '') %>"
                     href="<%= c.atendimentoIds.length ? `/admin/atendimentos/${c.atendimentoIds.join(',')}` : '#' %>"
                     <%= !c.atendimentoIds.length ? 'tabindex="-1" aria-disabled="true"' : '' %>
                   >
@@ -55,19 +55,6 @@
       </section>
     </main>
   </div>
-  <style>
-    /* Responsivo: botões ocupam toda largura no mobile */
-    @media (max-width: 680px) {
-      .contato-card {
-        gap: 0.8rem !important;
-        padding: 1.2rem 0.5rem !important;
-      }
-      .contato-card .btn {
-        width: 100% !important;
-        justify-content: center !important;
-        margin-top: 0 !important;
-      }
-    }
-  </style>
+
 </body>
 </html>

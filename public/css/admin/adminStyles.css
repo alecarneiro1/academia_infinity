@@ -396,3 +396,16 @@ a:hover{ color: #ff3b64; }
     display: inline-flex;
   }
 }
+
+    /* Responsivo: botões ocupam toda largura no mobile */
+    @media (max-width: 680px) {
+      .contato-card {
+        gap: 0.8rem !important;
+        padding: 1.2rem 0.5rem !important;
+      }
+      .contato-card .btn {
+        width: 100% !important;
+        justify-content: center !important;
+        margin-top: 0 !important;
+      }
+    }
