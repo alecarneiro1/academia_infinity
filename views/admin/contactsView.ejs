@@ -20,14 +20,32 @@
         <div class="grid grid--1">
           <% if (contacts && contacts.length > 0) { %>
             <% contacts.forEach(c => { %>
-              <div class="card contato-card" style="display:flex;align-items:center;gap:1.5rem;justify-content:space-between;flex-wrap:wrap;">
-                <div style="flex:1;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;">
-                  <span><b>Nome:</b> <%= c.contactname %></span>
-                  <span><b>WhatsApp:</b> <%= c.contactphone %></span>
+              <div class="card contato-card" style="display:flex;flex-direction:column;align-items:center;gap:1.2rem;justify-content:center;">
+                <div style="width:100%;text-align:center;">
+                  <div style="font-weight:bold;font-size:1.1rem;"><%= c.contactname %></div>
+                  <div style="margin-top:0.2rem;color:var(--muted);"><%= c.contactphone %></div>
                 </div>
-                <a class="btn btn--primary contato-btn-wa" href="https://wa.me/<%= c.contactphone.replace(/\D/g,'') %>" target="_blank">
-                  Falar com contato
-                </a>
+                <div style="width:100%;display:flex;flex-direction:column;gap:0.6rem;">
+                  <a class="btn btn--primary contato-btn-wa" style="width:100%;justify-content:center;" href="https://wa.me/<%= c.contactphone.replace(/\D/g,'') %>" target="_blank">
+                    Falar com contato
+                  </a>
+                  <a
+                    class="btn btn--outline"
+                    style="width:100%;justify-content:center;<%= !c.matriculaId ? 'pointer-events:none;opacity:.5;' : '' %>"
+                    href="<%= c.matriculaId ? `/admin/matricula/${c.matriculaId}` : '#' %>"
+                    <%= !c.matriculaId ? 'tabindex="-1" aria-disabled="true"' : '' %>
+                  >
+                    Matrícula
+                  </a>
+                  <a
+                    class="btn btn--outline"
+                    style="width:100%;justify-content:center;<%= !c.atendimentoIds.length ? 'pointer-events:none;opacity:.5;' : '' %>"
+                    href="<%= c.atendimentoIds.length ? `/admin/atendimentos/${c.atendimentoIds.join(',')}` : '#' %>"
+                    <%= !c.atendimentoIds.length ? 'tabindex="-1" aria-disabled="true"' : '' %>
+                  >
+                    Atendimentos
+                  </a>
+                </div>
               </div>
             <% }) %>
           <% } else { %>
@@ -38,17 +56,16 @@
     </main>
   </div>
   <style>
-    /* Responsivo: botão WhatsApp ocupa toda largura no mobile */
+    /* Responsivo: botões ocupam toda largura no mobile */
     @media (max-width: 680px) {
       .contato-card {
-        flex-direction: column !important;
-        align-items: stretch !important;
         gap: 0.8rem !important;
+        padding: 1.2rem 0.5rem !important;
       }
-      .contato-btn-wa {
-        width: 100%;
-        justify-content: center;
-        margin-top: 0.5rem;
+      .contato-card .btn {
+        width: 100% !important;
+        justify-content: center !important;
+        margin-top: 0 !important;
       }
     }
   </style>
