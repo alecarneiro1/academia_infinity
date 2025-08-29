@@ -21,6 +21,9 @@ app.use('/admin', contactsRoutes);
 const atendimentoRoutes = require('./routes/admin/atendimentoRoutes');
 app.use('/admin/atendimentos', atendimentoRoutes);
 
+const matriculasRoutes = require('./routes/admin/matriculasRoutes');
+app.use('/admin/matriculas', matriculasRoutes);
+
 // ──────────────────────────────────────────────────────────
 // Básico do Express
 // ──────────────────────────────────────────────────────────

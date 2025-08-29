@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dados da Matrícula</title>
+  <link rel="stylesheet" href="/css/admin/adminStyles.css" />
+  <script src="/js/admin/adminScripts.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <%- include('./partials/sidebarPartialView') %>
+    <main class="main">
+      <%- include('./partials/topbarPartialView') %>
+      <section class="container">
+        <h1 class="h1">Dados da Matrícula</h1>
+        <div class="card" style="max-width:600px;margin:auto;">
+          <div><b>Nome:</b> <%= matricula.nome_completo %></div>
+          <div><b>Endereço:</b> <%= matricula.endereco %></div>
+          <div><b>CEP:</b> <%= matricula.cep %></div>
+          <div><b>CPF:</b> <%= matricula.cpf %></div>
+          <div><b>WhatsApp:</b> <%= matricula.whatsapp %></div>
+          <div><b>Data de Nascimento:</b> <%= matricula.data_nascimento %></div>
+          <div><b>Plano:</b> <%= matricula.plano %></div>
+          <div><b>Objetivo:</b> <%= matricula.objetivo %></div>
+          <div><b>Origem:</b> <%= matricula.origem %></div>
+          <div><b>Data de cadastro:</b> <%= matricula.submitted_at ? new Date(matricula.submitted_at).toLocaleDateString('pt-BR') : '-' %></div>
+        </div>
+        <div style="margin-top:2rem;text-align:center;">
+          <a href="/admin/matriculas" class="btn btn--outline">Voltar</a>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

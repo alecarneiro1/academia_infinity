@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Matrículas</title>
+  <link rel="stylesheet" href="/css/admin/adminStyles.css" />
+  <script src="/js/admin/adminScripts.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <%- include('./partials/sidebarPartialView') %>
+    <main class="main">
+      <%- include('./partials/topbarPartialView') %>
+      <section class="container">
+        <h1 class="h1">Matrículas</h1>
+        <div style="margin-bottom:1.5rem;">
+          <input id="matricula-search" class="input" type="text" placeholder="Buscar por nome..." autocomplete="off" style="max-width:340px;">
+        </div>
+        <div id="matriculas-list">
+          <% matriculas.forEach(m => { %>
+            <div class="card" style="margin-bottom:1.2rem;">
+              <div style="font-weight:bold;font-size:1.1rem;"><%= m.nome_completo %></div>
+              <div style="margin-top:.3rem;">
+                <b>Data de cadastro:</b> <%= m.submitted_at ? new Date(m.submitted_at).toLocaleDateString('pt-BR') : '-' %>
+              </div>
+              <div style="margin-top:1rem;">
+                <a class="btn btn--outline" href="/admin/matriculas/<%= m.id %>">Ver dados</a>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+        <% if (hasMore) { %>
+          <div style="text-align:center;margin-top:1.5rem;">
+            <button id="btn-load-more-matriculas" class="btn btn--outline" data-page="1">Carregar mais</button>
+          </div>
+        <% } %>
+      </section>
+    </main>
+  </div>
+  <script>
+    // Busca instantânea
+    const searchInput = document.getElementById('matricula-search');
+    const list = document.getElementById('matriculas-list');
+    let searchTimeout = null;
+    let lastSearch = '';
+    let page = 1;
+    let loading = false;
+
+    function renderMatriculas(matriculas, clear = false) {
+      if (clear) list.innerHTML = '';
+      matriculas.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.marginBottom = '1.2rem';
+        card.innerHTML = `
+          <div style="font-weight:bold;font-size:1.1rem;">${m.nome_completo}</div>
+          <div style="margin-top:.3rem;"><b>Data de cadastro:</b> ${m.submitted_at ? new Date(m.submitted_at).toLocaleDateString('pt-BR') : '-'}</div>
+          <div style="margin-top:1rem;">
+            <a class="btn btn--outline" href="/admin/matriculas/${m.id}">Ver dados</a>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        clearTimeout(searchTimeout);
+        const value = searchInput.value.trim();
+        lastSearch = value;
+        page = 1;
+        searchTimeout = setTimeout(() => {
+          loading = true;
+          fetch(`/admin/matriculas?search=${encodeURIComponent(value)}&page=1`, { headers: { 'Accept': 'application/json' } })
+            .then(res => res.json())
+            .then(data => {
+              renderMatriculas(data.matriculas, true);
+              const btn = document.getElementById('btn-load-more-matriculas');
+              if (btn) btn.remove();
+              if (data.hasMore) {
+                const loadMore = document.createElement('button');
+                loadMore.id = 'btn-load-more-matriculas';
+                loadMore.className = 'btn btn--outline';
+                loadMore.dataset.page = '1';
+                loadMore.textContent = 'Carregar mais';
+                loadMore.style.marginTop = '1.5rem';
+                loadMore.style.display = 'block';
+                loadMore.style.marginLeft = 'auto';
+                loadMore.style.marginRight = 'auto';
+                loadMore.onclick = loadMoreHandler;
+                list.parentNode.appendChild(loadMore);
+              }
+              loading = false;
+            });
+        }, 300);
+      });
+    }
+
+    function loadMoreHandler() {
+      if (loading) return;
+      loading = true;
+      const btn = document.getElementById('btn-load-more-matriculas');
+      btn.disabled = true;
+      btn.textContent = 'Carregando...';
+      page++;
+      fetch(`/admin/matriculas?search=${encodeURIComponent(lastSearch)}&page=${page}`, { headers: { 'Accept': 'application/json' } })
+        .then(res => res.json())
+        .then(data => {
+          renderMatriculas(data.matriculas, false);
+          if (data.hasMore) {
+            btn.disabled = false;
+            btn.textContent = 'Carregar mais';
+          } else {
+            btn.remove();
+          }
+          loading = false;
+        });
+    }
+
+    const btnLoadMore = document.getElementById('btn-load-more-matriculas');
+    if (btnLoadMore) btnLoadMore.onclick = loadMoreHandler;
+  </script>
+</body>
+</html>
