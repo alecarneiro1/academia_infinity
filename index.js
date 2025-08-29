@@ -18,6 +18,9 @@ app.use('/admin', agenteRoutes);
 const contactsRoutes = require('./routes/admin/contactsRoutes');
 app.use('/admin', contactsRoutes);
 
+const atendimentoRoutes = require('./routes/admin/atendimentoRoutes');
+app.use('/admin/atendimentos', atendimentoRoutes);
+
 // ──────────────────────────────────────────────────────────
 // Básico do Express
 // ──────────────────────────────────────────────────────────
