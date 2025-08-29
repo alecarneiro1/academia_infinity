@@ -1,9 +1,14 @@
 // Add your dashboard-specific JavaScript here
 
-document.addEventListener('DOMContentLoaded', function () {
+// Sidebar toggle para todas as páginas do painel
+
+function setupSidebarToggle() {
   const sidebar = document.getElementById('sidebar');
   const toggleBtn = document.getElementById('sidebar-toggle');
   const backdrop = document.getElementById('sidebar-backdrop');
+
+  // Garante que sidebar e backdrop existem
+  if (!sidebar || !backdrop) return;
 
   function openSidebar() {
     sidebar.classList.add('is-open');
@@ -14,19 +19,18 @@ document.addEventListener('DOMContentLoaded', function () {
     backdrop.style.display = 'none';
   }
 
+  // Sempre remove e adiciona listeners para evitar múltiplos binds
   if (toggleBtn) {
-    toggleBtn.addEventListener('click', function () {
+    toggleBtn.onclick = function () {
       if (sidebar.classList.contains('is-open')) {
         closeSidebar();
       } else {
         openSidebar();
       }
-    });
+    };
   }
 
-  if (backdrop) {
-    backdrop.addEventListener('click', closeSidebar);
-  }
+  backdrop.onclick = closeSidebar;
 
   // Fecha sidebar ao redimensionar para desktop
   window.addEventListener('resize', function () {
@@ -34,4 +38,16 @@ document.addEventListener('DOMContentLoaded', function () {
       closeSidebar();
     }
   });
-});
+
+  // Fecha sidebar ao navegar (mobile SPA-like)
+  document.querySelectorAll('.nav__link').forEach(link => {
+    link.addEventListener('click', function () {
+      if (window.innerWidth <= 960) {
+        closeSidebar();
+      }
+    });
+  });
+}
+
+// Sempre executa após DOM pronto, inclusive em navegadores antigos
+window.addEventListener('DOMContentLoaded', setupSidebarToggle);

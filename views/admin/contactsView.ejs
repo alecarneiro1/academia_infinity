@@ -3,22 +3,54 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Editar Informações da Academia</title>
+  <title>Contatos</title>
   <link rel="stylesheet" href="/css/admin/adminStyles.css" />
-  <script src="/js/admin/agenteScripts.js" defer></script>
+  <script src="/js/admin/adminScripts.js" defer></script>
 </head>
 <body>
   <div class="app">
     <!-- Sidebar -->
     <%- include('./partials/sidebarPartialView') %>
-
     <!-- Main -->
     <main class="main">
       <!-- Topbar -->
       <%- include('./partials/topbarPartialView') %>
-
- 
+      <section class="container">
+        <h1 class="h1">Contatos</h1>
+        <div class="grid grid--1">
+          <% if (contacts && contacts.length > 0) { %>
+            <% contacts.forEach(c => { %>
+              <div class="card contato-card" style="display:flex;align-items:center;gap:1.5rem;justify-content:space-between;flex-wrap:wrap;">
+                <div style="flex:1;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;">
+                  <span><b>Nome:</b> <%= c.contactname %></span>
+                  <span><b>WhatsApp:</b> <%= c.contactphone %></span>
+                </div>
+                <a class="btn btn--primary contato-btn-wa" href="https://wa.me/<%= c.contactphone.replace(/\D/g,'') %>" target="_blank">
+                  Falar com contato
+                </a>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div class="card muted">Nenhum contato encontrado.</div>
+          <% } %>
+        </div>
+      </section>
     </main>
   </div>
+  <style>
+    /* Responsivo: botão WhatsApp ocupa toda largura no mobile */
+    @media (max-width: 680px) {
+      .contato-card {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.8rem !important;
+      }
+      .contato-btn-wa {
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+      }
+    }
+  </style>
 </body>
 </html>
