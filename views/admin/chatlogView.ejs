@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mensagens</title>
+  <link rel="stylesheet" href="/css/admin/adminStyles.css" />
+  <script src="/js/admin/adminScripts.js" defer></script>
+  <script src="/js/admin/chatlogScripts.js" defer></script>
+  <link rel="icon" type="image/png" href="/media/LOGO-INF.png" />
+</head>
+<body>
+  <div class="app">
+    <%- include('./partials/sidebarPartialView') %>
+    <main class="main">
+      <%- include('./partials/topbarPartialView') %>
+      <section class="container">
+        <h1 class="h1">Mensagens</h1>
+        <% if (!contact) { %>
+          <form class="chatlog-searchbox" id="chatlog-search-form" autocomplete="off" action="/admin/chatlogs" method="GET" style="position:relative;">
+            <input id="chatlog-contact-input" class="input" name="contact" type="text" placeholder="Buscar contato..." autocomplete="off" value="" style="font-size:1.2rem;">
+            <input type="hidden" id="chatlog-contact-id" name="userid" value="">
+            <div id="chatlog-dropdown" class="chatlog-dropdown" style="display:none;"></div>
+            <button type="submit" class="btn btn--primary" style="margin-top:1rem;width:100%;">Enviar</button>
+          </form>
+        <% } else { %>
+          <div class="chatlog-back-btn">
+            <a href="/admin/chatlogs" class="btn btn--outline">&larr; Voltar</a>
+          </div>
+        <% } %>
+        <% if (contact) { %>
+          <div class="chatlog-contact-label">
+            Conversa com <b><%= contact.contactname %></b>
+          </div>
+          <div class="chatlog-go-last-btn">
+            <button type="button" class="btn btn--primary" id="btn-go-last-msg">Ir para última mensagem</button>
+          </div>
+        <% } %>
+        <% if (contact) { %>
+          <div class="chatlog-chatbox" id="chatlog-chatbox">
+            <% 
+              let lastDate = null;
+              messages.forEach(m => {
+                const msgDate = m.time ? new Date(m.time).toLocaleDateString('pt-BR') : '';
+                const msgTime = m.time ? new Date(m.time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
+                if (msgDate !== lastDate) { 
+            %>
+              <div class="chatlog-date-divider"><%= msgDate %></div>
+            <% 
+                  lastDate = msgDate;
+                } 
+            %>
+              <% if (m.usermessage) { %>
+                <div class="chatlog-msg chatlog-msg-user">
+                  <div class="chatlog-bubble chatlog-bubble-user"><%= m.usermessage %></div>
+                  <div class="chatlog-time"><%= msgTime %></div>
+                </div>
+              <% } %>
+              <% if (m.agentresponse) { %>
+                <div class="chatlog-msg chatlog-msg-agent">
+                  <div class="chatlog-bubble chatlog-bubble-agent"><%= m.agentresponse %></div>
+                  <div class="chatlog-time"><%= msgTime %></div>
+                </div>
+              <% } %>
+            <% }) %>
+            <div id="last-msg"></div>
+          </div>
+        <% } %>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

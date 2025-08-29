@@ -6,6 +6,7 @@
   <title>Contatos</title>
   <link rel="stylesheet" href="/css/admin/adminStyles.css" />
   <script src="/js/admin/adminScripts.js" defer></script>
+  <link rel="icon" type="image/png" href="/media/LOGO-INF.png" />
 </head>
 <body>
   <div class="app">
@@ -19,7 +20,7 @@
         <h1 class="h1">Contatos</h1>
         <div class="grid grid--1">
           <% if (contacts && contacts.length > 0) { %>
-            <% contacts.forEach(c => { %>
+            <% contacts.forEach(function(c) { %>
               <div class="card contato-card" style="display:flex;flex-direction:column;align-items:center;gap:1.2rem;justify-content:center;">
                 <div style="width:100%;text-align:center;">
                   <div style="font-weight:bold;font-size:1.1rem;"><%= c.contactname %></div>
@@ -32,16 +33,16 @@
                   <a
                     class="btn btn--outline"
                     style="<%= 'width:100%;justify-content:center;' + (!c.matriculaId ? 'pointer-events:none;opacity:.5;' : '') %>"
-                    href="<%= c.matriculaId ? `/admin/matricula/${c.matriculaId}` : '#' %>"
-                    <%= !c.matriculaId ? 'tabindex="-1" aria-disabled="true"' : '' %>
+                    href="<%= c.matriculaId ? `/admin/matriculas/${c.matriculaId}` : '#' %>"
+                    <%= !c.matriculaId ? 'tabindex=-1 aria-disabled=true' : '' %>
                   >
                     Matrícula
                   </a>
                   <a
                     class="btn btn--outline"
-                    style="<%= 'width:100%;justify-content:center;' + (!c.atendimentoIds.length ? 'pointer-events:none;opacity:.5;' : '') %>"
-                    href="<%= c.atendimentoIds.length ? `/admin/atendimentos/${c.atendimentoIds.join(',')}` : '#' %>"
-                    <%= !c.atendimentoIds.length ? 'tabindex="-1" aria-disabled="true"' : '' %>
+                    style="<%= 'width:100%;justify-content:center;' + (!(c.atendimentoIds && c.atendimentoIds.length) ? 'pointer-events:none;opacity:.5;' : '') %>"
+                    href="<%= (c.atendimentoIds && c.atendimentoIds.length) ? `/admin/atendimentos/${c.atendimentoIds.join(',')}` : '#' %>"
+                    <%= !(c.atendimentoIds && c.atendimentoIds.length) ? 'tabindex=-1 aria-disabled=true' : '' %>
                   >
                     Atendimentos
                   </a>
@@ -55,6 +56,6 @@
       </section>
     </main>
   </div>
-
 </body>
+</html>
 </html>

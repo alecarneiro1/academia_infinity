@@ -6,6 +6,7 @@
   <title>Dashboard • Tema Dark Vermelho</title>
   <link rel="stylesheet" href="/css/admin/adminStyles.css" />
   <script src="/js/admin/adminScripts.js" defer></script>
+  <link rel="icon" type="image/png" href="/media/LOGO-INF.png" />
 </head>
 <body>
   <div class="app">
@@ -23,10 +24,7 @@
           <div>
             <h1 class="h1">Visão Geral</h1>
           </div>
-          <div class="actions">
-            <button class="btn btn--primary">Novo Relatório</button>
-            <button class="btn btn--outline">Exportar</button>
-          </div>
+
         </div>
 
         <% if (typeof error !== 'undefined' && error) { %>
@@ -34,29 +32,29 @@
         <% } %>
 
         <!-- KPI cards -->
-        <div class="grid grid--4">
-          <article class="card kpi">
+        <div class="grid grid--4" style="gap:0 !im">
+          <article class="card kpi mb-card">
             <div class="card__head">
               <span class="muted">Mensagens</span>
             </div>
             <div class="kpi__value"><%= (kpis && typeof kpis.total_mensages !== 'undefined') ? kpis.total_mensages : '-' %></div>
           </article>
 
-          <article class="card kpi">
+          <article class="card kpi mb-card">
             <div class="card__head">
               <span class="muted">Contatos</span>
             </div>
             <div class="kpi__value"><%= (kpis && typeof kpis.total_contacts !== 'undefined') ? kpis.total_contacts : '-' %></div>
           </article>
 
-          <article class="card kpi">
+          <article class="card kpi mb-card">
             <div class="card__head">
               <span class="muted">Atendimentos</span>
             </div>
             <div class="kpi__value"><%= (kpis && typeof kpis.total_summaries !== 'undefined') ? kpis.total_summaries : '-' %></div>
           </article>
 
-          <article class="card kpi">
+          <article class="card kpi mb-card">
             <div class="card__head">
               <span class="muted">Matrículas</span>
             </div>
@@ -66,7 +64,7 @@
 
         <!-- Content split -->
         <div class="grid grid--1">
-          <article class="card">
+          <article class="card mb-card">
             <div class="card__title">Mensagens recebidas nos últimos 10 dias</div>
             <div class="card__sub">Distribuição diária</div>
             <div class="chart">
@@ -79,39 +77,35 @@
         </div>
 
         <!-- Table -->
-        <article class="card">
+        <article class="card mb-card">
           <div class="card__title">Últimos atendimentos</div>
           <div class="table table--responsive">
             <table>
               <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Assunto</th>
-                  <th>Contato</th>
-                  <th>Data</th>
-                  <th></th>
-                </tr>
+          <tr>
+            <th>ID</th>
+            <th>Assunto</th>
+            <th>Contato</th>
+            <th>Data</th>
+          </tr>
               </thead>
               <tbody>
-                <% if (atendimentos && atendimentos.length > 0) { %>
-                  <% atendimentos.forEach(a => { %>
-                    <tr>
-                      <td>#<%= a.id %></td>
-                      <td><%= a.assunto %></td>
-                      <td><%= a.contato %></td>
-                      <td>
-                        <%= a.data ? new Date(a.data).toLocaleDateString('pt-BR') : '-' %>
-                      </td>
-                      <td>
-                        <button class="btn btn--xs btn--outline">Ver mais</button>
-                      </td>
-                    </tr>
-                  <% }) %>
-                <% } else { %>
-                  <tr>
-                    <td colspan="5" class="muted" style="text-align:center;">Nenhum atendimento encontrado</td>
-                  </tr>
-                <% } %>
+          <% if (atendimentos && atendimentos.length > 0) { %>
+            <% atendimentos.forEach(a => { %>
+              <tr>
+                <td>#<%= a.id %></td>
+                <td><%= a.assunto %></td>
+                <td><%= a.contato %></td>
+                <td>
+            <%= a.data ? new Date(a.data).toLocaleDateString('pt-BR') : '-' %>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="4" class="muted" style="text-align:center;">Nenhum atendimento encontrado</td>
+            </tr>
+          <% } %>
               </tbody>
             </table>
           </div>

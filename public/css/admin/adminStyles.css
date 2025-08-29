@@ -175,7 +175,7 @@ a:hover{ color: #ff3b64; }
 .page-head{
   display:flex; flex-wrap:wrap; align-items:end; justify-content:space-between; gap:1rem; margin: .6rem 0 1.2rem;
 }
-.h1{ font-size: var(--fs-2xl); margin:0; }
+.h1{ font-size: var(--fs-2xl); margin: 0 0 20px 0; }
 .h2{ font-size: var(--fs-xl); margin: 1.2rem 0 .6rem; }
 
 /* Grid helpers */
@@ -193,11 +193,18 @@ a:hover{ color: #ff3b64; }
   border-radius: var(--radius);
   box-shadow: var(--shadow-1);
   padding: 1rem;
-  margin-bottom: 1.2rem;   /* NOVO: garante espaçamento vertical mesmo fora de grid */
+  /* Remover o margin-bottom padrão */
+  /* margin-bottom: 1.2rem; */
 }
-.card__title{ font-weight:700; margin-bottom:.25rem; }
-.card__sub{ color: var(--muted); font-size: var(--fs-sm); margin-bottom: .5rem; }
-.card__head{ display:flex; align-items:center; justify-content:space-between; }
+.mb-card {
+  margin-bottom: 1.2rem;
+}
+
+/* Espaçamento entre textarea e botão de salvar nos forms do agente */
+.card form .textarea,
+.card .textarea {
+  margin-bottom: 1rem;
+}
 
 /* KPI */
 .kpi .kpi__value{ font-size: 1.8rem; font-weight: 800; letter-spacing:.2px; }
@@ -409,3 +416,72 @@ a:hover{ color: #ff3b64; }
         margin-top: 0 !important;
       }
     }
+
+/* Chatlog styles */
+.chatlog-chatbox {
+  width: 100%;
+  max-width: none;
+  margin: 2rem 0 0 0;
+  background: #151923;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px #000a;
+  padding: 1.5rem 1rem;
+  min-height: 320px;
+}
+.chatlog-searchbox {
+  max-width: 420px;
+  margin: 2rem auto 1.5rem;
+  position: relative;
+}
+.chatlog-searchbox.hide {
+  display: none !important;
+}
+.chatlog-back-btn {
+  display: flex;
+  justify-content: center;
+  margin: 2rem auto 1.5rem auto;
+  width: 100%;
+  max-width: 420px;
+}
+.chatlog-date-divider {
+  text-align: center;
+  color: var(--muted);
+  font-size: 1rem;
+  margin: 1.5rem 0 1rem 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.chatlog-msg { display: flex; flex-direction: column; margin-bottom: 1.2rem; }
+.chatlog-msg-user { align-items: flex-start; }
+.chatlog-msg-agent { align-items: flex-end; }
+.chatlog-bubble {
+  display: inline-block; padding: .7rem 1.1rem; border-radius: 16px; max-width: 80%; font-size: 1rem;
+  margin-bottom: .2rem; word-break: break-word;
+}
+.chatlog-bubble-user { background: linear-gradient(135deg, var(--red), var(--red-600)); color: #fff; border-bottom-left-radius: 4px; margin-right:auto;}
+.chatlog-bubble-agent { background: #232a36; color: #e7e9ee; border-bottom-right-radius: 4px; margin-left:auto;}
+.chatlog-time { font-size: .85rem; color: var(--muted); margin-top: .1rem; }
+.chatlog-contact-label { text-align:center; margin-bottom:1.2rem; font-size:1.1rem; color:var(--muted);}
+.chatlog-go-last-btn {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+/* Card titles and subtitles */
+.card__title {
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: .35rem;
+  color: var(--text);
+  letter-spacing: .1px;
+}
+
+.card__sub {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  margin-bottom: .7rem;
+  margin-top: -.2rem;
+}
+
+

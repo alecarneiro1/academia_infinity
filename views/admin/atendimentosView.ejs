@@ -48,7 +48,7 @@
                 <a
                   class="btn btn--outline"
                   style="width:100%;justify-content:center;<%= !a.matriculaId ? 'pointer-events:none;opacity:.5;' : '' %>"
-                  href="<%= a.matriculaId ? `/admin/matricula/${a.matriculaId}` : '#' %>"
+                  href="<%= a.matriculaId ? `/admin/matriculas/${a.matriculaId}` : '#' %>"
                   <%= !a.matriculaId ? 'tabindex="-1" aria-disabled="true"' : '' %>
                 >
                   Matrícula
@@ -56,7 +56,7 @@
                 <a
                   class="btn btn--outline"
                   style="width:100%;justify-content:center;<%= !(a.chatlogLink) ? 'pointer-events:none;opacity:.5;' : '' %>"
-                  href="<%= a.chatlogLink || '#' %>"
+                  href="<%= a.chatlogLink ? a.chatlogLink.replace('/admin/chatlog/', '/admin/chatlogs/') : '#' %>"
                   <%= !(a.chatlogLink) ? 'tabindex="-1" aria-disabled="true"' : '' %>
                 >
                   Ver conversa
@@ -117,7 +117,7 @@
                   <a
                     class="btn btn--outline"
                     style="width:100%;justify-content:center;${!a.chatlogLink ? 'pointer-events:none;opacity:.5;' : ''}"
-                    href="${a.chatlogLink || '#'}"
+                    href="${a.chatlogLink ? a.chatlogLink.replace('/admin/chatlog/', '/admin/chatlogs/') : '#'}"
                     ${!a.chatlogLink ? 'tabindex="-1" aria-disabled="true"' : ''}
                   >
                     Ver conversa
