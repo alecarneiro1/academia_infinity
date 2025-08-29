@@ -200,6 +200,7 @@ a:hover{ color: #ff3b64; }
   margin-bottom: 1.2rem;
 }
 
+
 /* Espaçamento entre textarea e botão de salvar nos forms do agente */
 .card form .textarea,
 .card .textarea {
@@ -482,6 +483,27 @@ a:hover{ color: #ff3b64; }
   font-size: var(--fs-sm);
   margin-bottom: .7rem;
   margin-top: -.2rem;
+}
+
+/* Corrige duplo espaçamento entre cards KPI do dashboard no mobile,
+   mas mantém espaçamento entre grids diferentes */
+@media (max-width: 680px) {
+  .grid--4.dashboard-kpis {
+    gap: 0 !important;
+    margin-bottom: 1.2rem !important;
+  }
+  .grid--4.dashboard-kpis > .card.mb-card {
+    margin-bottom: 1.2rem !important;
+  }
+  .grid--4.dashboard-kpis > .card.mb-card:last-child {
+    margin-bottom: 0 !important;
+  }
+  /* Garante espaçamento entre grids empilhados */
+  .grid--4.dashboard-kpis + .grid--1,
+  .grid--4.dashboard-kpis + article,
+  .grid--4.dashboard-kpis + .card {
+    margin-top: 1.2rem !important;
+  }
 }
 
 
