@@ -1,0 +1,745 @@
+/* Remove underline from all links */
+a {
+  text-decoration: none;
+}
+/* =========================
+   Tema Dark (variáveis)
+   ========================= */
+:root{
+  --bg: #0f1115;         /* fundo geral */
+  --surface: #171a21;    /* cartões/caixas */
+  --border: #262a33;     /* linhas sutis */
+  --text: #e8eaed;       /* textos principais */
+  --muted: #a6adbb;      /* textos secundários */
+  --primary: #CF1742;    /* acento (links/botões) */
+
+  --radius: 16px;
+  --gap: 16px;
+  --header-h: 64px;
+  --sidebar-w: 260px;
+  --shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+/* =========================
+   Reset básico
+   ========================= */
+*,*::before,*::after{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================
+   Estrutura
+   ========================= */
+.nav-toggle{ position: fixed; inset: 0; opacity: 0; pointer-events: none; }
+
+.sidebar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  width: min(86vw, var(--sidebar-w));
+  background: #0b0d12;
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transform: translateY(100%);           /* escondida no mobile (desce do rodapé) */
+  transition: transform .28s ease;
+  z-index: 40;
+}
+.sidebar__logo{
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: .5px;
+}
+.sidebar__nav{
+  display: grid;
+  gap: 6px;
+}
+.nav__link{
+  color: var(--text);
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 10px;
+  display: block;
+}
+.nav__link:hover,
+.nav__link:focus{
+  background: color-mix(in oklab, var(--surface) 82%, black 18%);
+  outline: none;
+}
+.nav__link.is-active{
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+/* Sidebar visível quando toggle marcado (mobile) */
+.nav-toggle:checked ~ .sidebar{
+  transform: translateY(0);
+}
+
+/* Topbar */
+.topbar{
+  position: sticky;
+  top: 0;
+  height: var(--header-h);
+  display: grid;
+  place-items: center;
+  border-bottom: 1px solid var(--border);
+
+  backdrop-filter: blur(8px);
+  z-index: 30;
+}
+.topbar__title{
+  margin: 0;
+  font-size: clamp(18px, 2.6vw, 22px);
+  letter-spacing: .5px;
+}
+
+/* Conteúdo principal */
+.content{
+  padding: 16px;
+  display: grid;
+  gap: var(--gap);
+}
+
+/* ===== Grade reutilizável para boxes ===== */
+.blocks{
+  display: grid;
+  gap: var(--gap);
+  align-items: start;
+  grid-template-columns: 1fr; /* empilhado no mobile */
+}
+
+/* Modos de coluna: 2 ou 3 por linha */
+.blocks.cols-2{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+.blocks.cols-3{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+
+/* Utilitários de “span” (para fazer um card ocupar 2/3 colunas) */
+.box-span-2{ grid-column: span 2; }
+.box-span-3{ grid-column: span 3; }
+
+/* No mobile, tudo volta a 1 coluna */
+@media (max-width: 699px){
+  .blocks{ grid-template-columns: 1fr !important; }
+  .box-span-2, .box-span-3{ grid-column: auto; }
+}
+
+/* Em telas grandes você pode reforçar as grades */
+@media (min-width: 1024px){
+  .blocks.cols-2{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .blocks.cols-3{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+
+
+/* Cartões & blocos */
+.card{
+  transition: border-color 1.18s;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(14px, 2vw, 20px);
+}
+
+.card:hover {
+  border-color: var(--primary);
+}
+
+
+/* KPIs */
+.kpis{
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(2, 1fr);
+}
+.kpi{ display: grid; gap: 6px; }
+.kpi__label{
+  margin: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+.kpi__value{
+  font-size: clamp(28px, 7vw, 36px);
+  font-weight: 800;
+}
+
+/* Blocos (gráfico/tabela) */
+.block{ display: grid; gap: 14px; }
+.block__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.block__title{ margin: 0; font-size: clamp(16px, 2.2vw, 18px); }
+.block__subtitle{ margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+
+
+
+/* Placeholder do gráfico */
+.placeholder-chart{
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  height: clamp(220px, 40vw, 320px);
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+/* Tabela */
+.table-wrap{ overflow:auto; border-radius: 12px; border:1px solid var(--border); }
+.table{
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 540px;
+  background: #12161f;
+}
+.table th, .table td{
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-size: 14px;
+}
+.table thead th{
+  background: #10141c;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Hambúrguer (mobile, fixo no rodapé) */
+.hamburger{
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--primary);
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  z-index: 50;
+}
+.hamburger span{
+  display: block;
+  width: 34px;
+  height: 4px;
+  border-radius: 999px;
+  background: #fff;
+}
+
+/* Overlay para fechar o menu tocando fora */
+.overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 35;
+}
+.nav-toggle:checked ~ .overlay{
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =========================
+   Breakpoints
+   ========================= */
+@media (min-width: 1024px){
+  /* Sidebar fixa à esquerda no desktop */
+  .sidebar{
+    transform: none !important;
+    width: var(--sidebar-w);
+    top: 0;
+  }
+  .topbar{
+    margin-left: var(--sidebar-w);
+  }
+  .content{
+    margin-left: var(--sidebar-w);
+    padding: 20px;
+  }
+  .hamburger{ display: none; }     /* não mostra o botão no desktop */
+
+  .kpis{
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ===== Matrículas (cards em grid dentro de um card maior) ===== */
+.enroll-list{
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: 1fr;            /* tablet/celular: 1 por linha */
+}
+
+@media (min-width: 1024px){
+  .enroll-list{ grid-template-columns: repeat(3, minmax(0,1fr)); } /* PC: 3 por linha */
+}
+
+.enroll-card{
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.enroll-card__name{
+  margin: 0 0 6px;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.enroll-card__meta{
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.enroll-card__meta strong{ color: var(--text); }
+
+.enroll-card__footer{ margin-top: 8px; }
+
+.btn--primary-soft{
+  border: 1px solid color-mix(in oklab, var(--primary) 70%, #000 30%);
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+  color: var(--text);
+}
+.btn--primary-soft:hover,
+.btn--primary-soft:focus{
+  background: color-mix(in oklab, var(--primary) 20%, transparent);
+  border-color: color-mix(in oklab, var(--primary) 85%, #000 15%);
+  outline: none;
+}
+
+
+
+/* ===== Busca (card do filtro acima do loop) ===== */
+.searchbox{
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.search-row{
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: 1fr auto;       /* input + botão */
+}
+@media (max-width: 699px){
+  .search-row{ grid-template-columns: 1fr; } /* empilha no mobile */
+}
+
+.search-field{ position: relative; }
+.search-field .icon{
+  position: absolute; left: 12px; top: 50%;
+  transform: translateY(-50%);
+  width: 18px; height: 18px; opacity: .7;
+}
+
+.search-input{
+  width: 100%;
+  padding: 10px 12px 10px 40px;          /* espaço pro ícone */
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #12161f;
+  color: var(--text);
+  font: inherit;
+}
+.search-input::placeholder{ color: var(--muted); }
+.search-input:focus{
+  outline: none;
+  border-color: color-mix(in oklab, var(--primary) 70%, #000 30%);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 24%, transparent);
+}
+
+
+
+
+
+
+/* ===== Atendimentos (1 card por linha) ===== */
+.ticket-list{
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: 1fr;      /* sempre 1 por linha */
+}
+
+/* Reaproveita o visual dos cards de matrícula */
+.ticket-card{ /* .enroll-card já dá base de cor/borda/sombra */
+}
+
+/* Título do atendimento */
+.ticket-card__title{
+  margin: 0 0 10px;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+/* Tabelinha (chave:valor) */
+.kv{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 14px;
+  align-items: center;
+  font-size: 14px;
+  margin: 0 0 12px;
+}
+.kv dt{
+  color: var(--muted);
+}
+.kv dd{
+  margin: 0;
+  color: var(--text);
+}
+
+/* Resumo */
+.summary{
+  margin: 6px 0 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.summary h5{
+  margin: 0;
+  font-size: 16px;
+  color: var(--text);
+}
+.summary p{
+    margin-top:0;
+}
+
+
+
+
+/* Busca dos atendimentos (mesmo estilo do card de busca de matrículas) */
+.ticket-search.enroll-search{ /* alias para reaproveitar estilos existentes */ }
+
+
+
+
+/* Botões */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .6rem .9rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, transform .06s ease;
+}
+.btn:hover, .btn:focus{
+  background: color-mix(in oklab, var(--surface) 82%, black 18%);
+  outline: none;
+}
+.btn:active{ transform: translateY(1px); }
+.btn--ghost{}
+
+
+/* Ações */
+.btn-row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Botões nas variações pedidas */
+.btn--primary{
+  background: var(--primary);
+  color: #fff;
+  border: 1px solid color-mix(in oklab, var(--primary) 75%, #000 25%);
+}
+.btn--primary:hover,
+.btn--primary:focus{
+  filter: brightness(1.05);
+  outline: none;
+}
+
+.btn--outline-primary{
+  background: transparent;
+  color: var(--text);
+  border: 1px solid color-mix(in oklab, var(--primary) 70%, #000 30%);
+}
+.btn--outline-primary:hover,
+.btn--outline-primary:focus{
+  background: color-mix(in oklab, var(--primary) 14%, transparent);
+  outline: none;
+}
+
+/* Mobile: botões em coluna (um embaixo do outro) */
+@media (max-width: 699px){
+  .ticket-card .btn-row{
+    flex-direction: column;
+  }
+  .ticket-card .btn-row .btn{
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+
+
+
+/* ===== Usuários (3 por linha no PC, 1 no tablet/celular) ===== */
+.user-list{
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: 1fr;                 /* mobile/tablet */
+}
+@media (min-width: 1024px){
+  .user-list{ grid-template-columns: repeat(3, minmax(0,1fr)); } /* desktop */
+}
+
+/* Reaproveita .enroll-card e só ajusta o conteúdo */
+.user-card{ /* base visual vem de .enroll-card */ }
+
+.user-card__name{
+  margin: 0 0 6px;
+  font-weight: 700;
+  font-size: 18px;
+}
+.user-card__phone{
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.user-card__phone strong{ color: var(--text); }
+
+/* 3 botões, empilhados e full width */
+.user-actions{
+  display: grid;
+  gap: 10px;
+}
+.user-actions .btn{
+  width: 100%;
+  justify-content: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== Mensagens: filtro (datepicker) + chat ===== */
+
+/* Reaproveita o visual do card de busca */
+.msg-filter.enroll-search {}
+
+/* Cabeçalho do mês e navegação (se quiser usar depois) */
+.date-picker{
+  display: grid;
+  gap: 12px;
+}
+.date-picker__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+}
+.date-picker__title{
+  margin: 0;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* Semana e dias */
+.date-picker__weekdays,
+.date-picker__grid{
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0,1fr));
+  gap: 6px;
+}
+.date-picker__weekdays span{
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Cada dia é um “botão” */
+.dp-day{
+  display: grid;
+  place-items: center;
+  padding: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #12161f;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  user-select: none;
+}
+.dp-day:is(:hover,:focus){ outline: none; background: color-mix(in oklab, var(--surface) 82%, black 18%); }
+
+/* Estados para você ligar via back-end */
+.dp-day.is-active{
+  background: var(--primary);
+  color: #fff;
+  border-color: color-mix(in oklab, var(--primary) 80%, #000 20%);
+}
+.dp-day.is-disabled{
+  opacity: .35;
+  pointer-events: none;
+  filter: grayscale(35%);
+}
+.dp-day.is-today{
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+
+
+/* ===== Datepicker: navegação, ações e microinterações ===== */
+.date-picker{ gap: 14px; } /* um pouco mais de respiro */
+.date-picker__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.date-nav{ display: inline-flex; align-items: center; gap: 8px; }
+.date-btn{
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #12161f;
+  color: var(--text);
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.date-btn:hover, .date-btn:focus{
+  background: color-mix(in oklab, var(--surface) 82%, black 18%);
+  outline: none;
+}
+
+/* linha “Exibindo conversa com …” */
+.picker-context{
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.picker-context strong{ color: var(--text); }
+
+/* Hover bem sutil nos dias disponíveis */
+.dp-day{
+  transition: transform .08s ease, background .2s ease, border-color .2s ease;
+}
+.dp-day:not(.is-disabled):hover,
+.dp-day:not(.is-disabled):focus{
+  transform: scale(1.02);
+  background: color-mix(in oklab, var(--primary) 8%, #12161f);
+  outline: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Chat (bolhas) */
+.chat{
+  display: grid;
+  gap: 10px;
+}
+.chat__day{
+  margin: 10px auto 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  background: #10141c;
+}
+.msg{
+  max-width: min(720px, 85%);
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #12161f;
+  display: grid;
+  gap: 6px;
+}
+.msg__text{ margin: 0; }
+.msg__time{ justify-self: end; font-size: 11px; color: var(--muted); }
+
+/* Entrada (contato) à esquerda; Saída (agente) à direita */
+.msg--in{ justify-self: start; }
+.msg--out{
+  justify-self: end;
+  background: color-mix(in oklab, var(--primary) 12%, #12161f);
+  border-color: color-mix(in oklab, var(--primary) 60%, #000 40%);
+}
+
+
+
+/* ===== Agente (editor) ===== */
+.agent-list{
+  display: grid;
+  gap: var(--gap);
+}
+.agent-card{ /* visual herda dos seus cards */
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.agent-card__title{
+  margin: 0 0 10px;
+  font-weight: 800;
+  font-size: 16px;
+}
+.textarea{
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #10141c;
+  color: var(--text);
+  font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+.textarea:focus{
+  outline: none;
+  border-color: color-mix(in oklab, var(--primary) 70%, #000 30%);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 22%, transparent);
+}
+.field-actions{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.btn--sm{ padding: .5rem .8rem; border-radius: 10px; font-size: .95rem; }

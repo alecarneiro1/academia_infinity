@@ -1,123 +1,91 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard • Tema Dark Vermelho</title>
-  <link rel="stylesheet" href="/css/admin/adminStyles.css" />
-  <script src="/js/admin/adminScripts.js" defer></script>
-  <link rel="icon" type="image/png" href="/media/FAVICON.png" />
-</head>
-<body>
-  <div class="app">
-    <!-- Sidebar -->
-    <%- include('./partials/sidebarPartialView') %>
+<%- include('./partials/headPartialView') %>
+<%- include('./partials/headerPartialView') %>
 
-    <!-- Main -->
-    <main class="main">
-      <!-- Topbar -->
-      <%- include('./partials/topbarPartialView') %>
 
-      <section class="container">
-        <!-- Page header -->
-        <div class="page-head">
-          <div>
-            <h1 class="h1">Visão Geral</h1>
-          </div>
+<main class="content">
+    <!-- KPIs -->
+    <section class="kpis" aria-label="Indicadores">
+      <article class="card kpi">
+        <h2 class="kpi__label">Mensagens</h2>
+        <div class="kpi__value">264</div>
+      </article>
+      <article class="card kpi">
+        <h2 class="kpi__label">Contatos</h2>
+        <div class="kpi__value">125</div>
+      </article>
+      <article class="card kpi">
+        <h2 class="kpi__label">Atendimentos</h2>
+        <div class="kpi__value">125</div>
+      </article>
+      <article class="card kpi">
+        <h2 class="kpi__label">Matrículas</h2>
+        <div class="kpi__value">125</div>
+      </article>
+    </section>
 
+    <!-- Gráfico (placeholder) -->
+    <section class="card block" aria-label="Mensagens recebidas">
+      <header class="block__head">
+        <div>
+          <h3 class="block__title">Mensagens recebidas</h3>
+          <p class="block__subtitle">Distribuição diária</p>
         </div>
-
-        <% if (typeof error !== 'undefined' && error) { %>
-          <div style="color:#e11d48; font-weight:bold; margin-bottom:1rem;"><%= error %></div>
-        <% } %>
-
-        <!-- KPI cards -->
-        <div class="grid grid--4 dashboard-kpis">
-          <article class="card kpi mb-card">
-            <div class="card__head">
-              <span class="muted">Mensagens</span>
-            </div>
-            <div class="kpi__value"><%= (kpis && typeof kpis.total_mensages !== 'undefined') ? kpis.total_mensages : '-' %></div>
-          </article>
-
-          <article class="card kpi mb-card">
-            <div class="card__head">
-              <span class="muted">Contatos</span>
-            </div>
-            <div class="kpi__value"><%= (kpis && typeof kpis.total_contacts !== 'undefined') ? kpis.total_contacts : '-' %></div>
-          </article>
-
-          <article class="card kpi mb-card">
-            <div class="card__head">
-              <span class="muted">Atendimentos</span>
-            </div>
-            <div class="kpi__value"><%= (kpis && typeof kpis.total_summaries !== 'undefined') ? kpis.total_summaries : '-' %></div>
-          </article>
-
-          <article class="card kpi mb-card">
-            <div class="card__head">
-              <span class="muted">Matrículas</span>
-            </div>
-            <div class="kpi__value"><%= (kpis && typeof kpis.total_matriculas !== 'undefined') ? kpis.total_matriculas : '-' %></div>
-          </article>
+        <div class="filters" role="group" aria-label="Filtros de período">
+          <button class="btn btn--ghost">Hoje</button>
+          <button class="btn btn--ghost">Semana</button>
+          <button class="btn btn--ghost">Mês</button>
+          <button class="btn btn--ghost">Ano</button>
         </div>
+      </header>
+      <div class="placeholder-chart" aria-hidden="true">Gráfico (placeholder)</div>
+    </section>
 
-        <!-- Content split -->
-        <div class="grid grid--1">
-          <article class="card mb-card dashb">
-            <div class="card__title">Mensagens recebidas nos últimos 10 dias</div>
-            <div class="card__sub">Distribuição diária</div>
-            <div class="chart">
-              <canvas id="messagesChart" height="258"></canvas>
-            </div>
-            <div class="legend">
-              <span class="legend__item"><span class="dot"></span> Mensagens</span>
-            </div>
-          </article>
+    <!-- Tabela -->
+    <section class="card block" aria-label="Atendimentos mais recentes">
+      <header class="block__head">
+        <div>
+          <h3 class="block__title">Atendimentos</h3>
+          <p class="block__subtitle">Atendimentos mais recentes</p>
         </div>
+      </header>
 
-        <!-- Table -->
-        <article class="card mb-card">
-          <div class="card__title">Últimos atendimentos</div>
-          <div class="table table--responsive">
-            <table>
-              <thead>
-          <tr>
-            <th>ID</th>
-            <th>Assunto</th>
-            <th>Contato</th>
-            <th>Data</th>
-          </tr>
-              </thead>
-              <tbody>
-          <% if (atendimentos && atendimentos.length > 0) { %>
-            <% atendimentos.forEach(a => { %>
-              <tr>
-                <td>#<%= a.id %></td>
-                <td><%= a.assunto %></td>
-                <td><%= a.contato %></td>
-                <td>
-            <%= a.data ? new Date(a.data).toLocaleDateString('pt-BR') : '-' %>
-                </td>
-              </tr>
-            <% }) %>
-          <% } else { %>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
             <tr>
-              <td colspan="4" class="muted" style="text-align:center;">Nenhum atendimento encontrado</td>
+              <th>ID</th>
+              <th>Assunto</th>
+              <th>Contato</th>
+              <th>Data</th>
             </tr>
-          <% } %>
-              </tbody>
-            </table>
-          </div>
-        </article>
+          </thead>
+          <tbody>
+            <tr><td>#1025</td><td>Dúvida sobre planos</td><td>Marina P.</td><td>28/08/2025 09:41</td></tr>
+            <tr><td>#1024</td><td>Cancelamento</td><td>Rafael L.</td><td>28/08/2025 09:10</td></tr>
+            <tr><td>#1023</td><td>Agendamento avaliação</td><td>Bianca S.</td><td>28/08/2025 08:55</td></tr>
+            <tr><td>#1022</td><td>Troca de plano</td><td>Gustavo T.</td><td>28/08/2025 08:20</td></tr>
+            <tr><td>#1021</td><td>Acesso ao app</td><td>Camila R.</td><td>28/08/2025 07:58</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+</main>
 
-     
 
-      </section>
-    </main>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="/js/admin/dashboardScripts.js"></script>
+
+
+
+  <!-- Botão hambúrguer (mobile) -->
+  <label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
+    <span></span><span></span><span></span>
+  </label>
+
+  <!-- Overlay para fechar o menu quando aberto no mobile -->
+  <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
+
+  <!-- Scripts -->
+  <script src="adminGlobalScripts.js"></script>
+
 </body>
 </html>

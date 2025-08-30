@@ -1,53 +1,106 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Editar Informações da Academia</title>
-  <link rel="stylesheet" href="/css/admin/adminStyles.css" />
-  <script src="/js/admin/adminScripts.js" defer></script>
-  <link rel="icon" type="image/png" href="/media/FAVICON.png" />
-</head>
-<body>
-  <div class="app">
-    <!-- Sidebar -->
-    <%- include('./partials/sidebarPartialView') %>
+<%- include('./partials/headPartialView') %>
+<%- include('./partials/headerPartialView') %>
 
-    <!-- Main -->
-    <main class="main">
-      <!-- Topbar -->
-      <%- include('./partials/topbarPartialView') %>
 
-      <section class="container">
-        <h1 class="h1">Agente</h1>
-        <div class="grid grid--1">
-          <% 
-            // Mapeamento dos títulos corretos pelo id ou pelo título antigo
-            const titleMap = {
-              planos: 'Planos',
-              'personal-trainer': 'Personal Trainer',
-              links: 'Links',
-              localizacao: 'Localização',
-              promocoes: 'Promoções',
-              horarios: 'Horários'
-            };
-          %>
-          <% infos.forEach(info => { %>
-            <form class="card" method="POST" action="/admin/agente/<%= info.id %>">
-              <div class="card__title">
-                <%= titleMap[info.titulo.trim().toLowerCase()] || info.titulo %>
-              </div>
-              <div class="field field--col2">
-                <textarea class="textarea" name="conteudo" rows="6"><%= info.conteudo %></textarea>
-              </div>
-              <div class="form__actions">
-                <button class="btn btn--primary" type="submit">Salvar</button>
-              </div>
-            </form>
-          <% }) %>
-        </div>
-      </section>
-    </main>
-  </div>
+
+  <main class="content">
+<article class="card block" id="agente">
+  <header class="block__head">
+    <div>
+      <h3 class="block__title">Agente</h3>
+      <p class="block__subtitle">Informações usadas pelo assistente</p>
+    </div>
+  </header>
+
+  <section class="agent-list">
+    <!-- Planos -->
+    <div class="agent-card">
+      <h4 class="agent-card__title">Planos</h4>
+      <textarea class="textarea" rows="8">Plano Semestral: R$ 129/mês (total R$ 774).
+Plano Trimestral: R$ 139/mês (total R$ 399).
+Plano Mensal: R$ 159/mês.
+
+• Horários: Segunda a sábado, das 06:00 às 22:30.
+• Modalidade: musculação livre, com orientação do time.
+• Avaliação: grátis na matrícula. Reavaliações: R$ 50 (desconta do plano caso feche após o treino).</textarea>
+      <div class="field-actions">
+        <button class="btn btn--primary btn--sm" type="button">Salvar</button>
+      </div>
+    </div>
+
+    <!-- Personal Trainer -->
+    <div class="agent-card">
+      <h4 class="agent-card__title">Personal Trainer</h4>
+      <textarea class="textarea" rows="6">Débora Carneiro
+WhatsApp: (42) 99956-3427
+
+Alisson Soledas
+WhatsApp: (42) 98888-4739</textarea>
+      <div class="field-actions">
+        <button class="btn btn--primary btn--sm" type="button">Salvar</button>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="agent-card">
+      <h4 class="agent-card__title">Links</h4>
+      <textarea class="textarea" rows="6">Grupo do WhatsApp: https://chat.whatsapp.com/XXXXXXXX
+Google Maps: https://maps.google.com/?q=infinity
+Instagram: https://www.instagram.com/infinity.academia_</textarea>
+      <div class="field-actions">
+        <button class="btn btn--primary btn--sm" type="button">Salvar</button>
+      </div>
+    </div>
+
+    <!-- Localização -->
+    <div class="agent-card">
+      <h4 class="agent-card__title">Localização</h4>
+      <textarea class="textarea" rows="6">Rua Professor Cleto, 285 — Centro, União da Vitória — PR,
+em frente ao Herberth Materiais de Construção.
+Região central, fácil acesso e ótima localização.
+
+Google Maps: https://maps.app.goo.gl/SiwN0VbYQy8xQb6</textarea>
+      <div class="field-actions">
+        <button class="btn btn--primary btn--sm" type="button">Salvar</button>
+      </div>
+    </div>
+
+    <!-- Promoções -->
+    <div class="agent-card">
+      <h4 class="agent-card__title">Promoções</h4>
+      <textarea class="textarea" rows="5">Promoção do Dia do Caranguejo
+Desconto de 5% na matrícula para caranguejos.
+Válido até 14 de setembro.</textarea>
+      <div class="field-actions">
+        <button class="btn btn--primary btn--sm" type="button">Salvar</button>
+      </div>
+    </div>
+
+    <!-- Horários -->
+    <div class="agent-card">
+      <h4 class="agent-card__title">Horários</h4>
+      <textarea class="textarea" rows="5">De segunda a sexta das 06:00 às 22:30.
+Sábados das 9:00 às 15:00.
+Domingos e feriados: fechado.</textarea>
+      <div class="field-actions">
+        <button class="btn btn--primary btn--sm" type="button">Salvar</button>
+      </div>
+    </div>
+  </section>
+</article>
+  </main>
+
+  <!-- Botão hambúrguer (mobile) -->
+  <label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
+    <span></span><span></span><span></span>
+  </label>
+
+  <!-- Overlay para fechar o menu quando aberto no mobile -->
+  <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
+
+  <!-- Scripts -->
+  <script src="agenteView.ejs"></script>
+  <script src="adminGlobalScripts.js"></script>
+
 </body>
 </html>

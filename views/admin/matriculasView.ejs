@@ -1,126 +1,89 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Matrículas</title>
-  <link rel="stylesheet" href="/css/admin/adminStyles.css" />
-  <script src="/js/admin/adminScripts.js" defer></script>
-  <link rel="icon" type="image/png" href="/media/FAVICON.png" />
-</head>
-<body>
-  <div class="app">
-    <%- include('./partials/sidebarPartialView') %>
-    <main class="main">
-      <%- include('./partials/topbarPartialView') %>
-      <section class="container">
-        <h1 class="h1">Matrículas</h1>
-        <div style="margin-bottom:1.5rem;">
-          <input id="matricula-search" class="input" type="text" placeholder="Buscar por nome..." autocomplete="off" style="max-width:340px;">
-        </div>
-        <div id="matriculas-list">
-          <% matriculas.forEach(m => { %>
-            <div class="card" style="margin-bottom:1.2rem;">
-              <div style="font-weight:bold;font-size:1.1rem;"><%= m.nome_completo %></div>
-              <div style="margin-top:.3rem;">
-                <b>Data de cadastro:</b> <%= m.submitted_at ? new Date(m.submitted_at).toLocaleDateString('pt-BR') : '-' %>
-              </div>
-              <div style="margin-top:1rem;">
-                <a class="btn btn--outline" href="<%= '/admin/matriculas/' + m.id %>">Ver dados</a>
-              </div>
-            </div>
-          <% }) %>
-        </div>
-        <% if (hasMore) { %>
-          <div style="text-align:center;margin-top:1.5rem;">
-            <button id="btn-load-more-matriculas" class="btn btn--outline" data-page="1">Carregar mais</button>
-          </div>
-        <% } %>
-      </section>
-    </main>
+<%- include('./partials/headPartialView') %>
+<%- include('./partials/headerPartialView') %>
+
+  
+  
+  
+  
+
+
+<main class="content">
+  <article class="card block">
+    <header class="block__head">
+      <div>
+        <h3 class="block__title">Matrículas</h3>
+        <p class="block__subtitle">Formulários preenchidos nos atendimentos</p>
+      </div>
+    </header>
+    <form class="searchbox" role="search" onsubmit="return false">
+  <div class="search-row">
+    <div class="search-field">
+      <!-- ícone -->
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor"
+          d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
+      </svg>
+      <input
+        class="search-input"
+        type="search"
+        placeholder="Pesquisar por nome…"
+        aria-label="Pesquisar matrículas" />
+    </div>
+
+    <button class="btn btn--primary-soft" type="submit">Buscar</button>
   </div>
-  <script>
-    // Busca instantânea
-    const searchInput = document.getElementById('matricula-search');
-    const list = document.getElementById('matriculas-list');
-    let searchTimeout = null;
-    let lastSearch = '';
-    let page = 1;
-    let loading = false;
+</form>
+   <div class="enroll-list">
+  <!-- LOOP: repita este bloco para cada matrícula -->
+  <article class="enroll-card">
+    <h4 class="enroll-card__name">Alexandre Carneiro Sloboda</h4>
+    <p class="enroll-card__meta"><strong>Data de cadastro:</strong> 26/08/2025</p>
+    <div class="enroll-card__footer">
+      <a href="#" class="btn btn--primary">Ver matrícula</a>
+    </div>
+  </article>
 
-    function renderMatriculas(matriculas, clear = false) {
-      if (clear) list.innerHTML = '';
-      matriculas.forEach(m => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.style.marginBottom = '1.2rem';
-        card.innerHTML = `
-          <div style="font-weight:bold;font-size:1.1rem;">${m.nome_completo}</div>
-          <div style="margin-top:.3rem;"><b>Data de cadastro:</b> ${m.submitted_at ? new Date(m.submitted_at).toLocaleDateString('pt-BR') : '-'}</div>
-          <div style="margin-top:1rem;">
-            <a class="btn btn--outline" href="/admin/matriculas/${m.id}">Ver dados</a>
-          </div>
-        `;
-        list.appendChild(card);
-      });
-    }
+  <!-- exemplos extras (remova depois e mantenha só o loop) -->
+  <article class="enroll-card">
+    <h4 class="enroll-card__name">Marina Pereira</h4>
+    <p class="enroll-card__meta"><strong>Data de cadastro:</strong> 25/08/2025</p>
+    <div class="enroll-card__footer">
+      <a href="#" class="btn btn--primary">Ver matrícula</a>
+    </div>
+  </article>
 
-    if (searchInput) {
-      searchInput.addEventListener('input', function () {
-        clearTimeout(searchTimeout);
-        const value = searchInput.value.trim();
-        lastSearch = value;
-        page = 1;
-        searchTimeout = setTimeout(() => {
-          loading = true;
-          fetch(`/admin/matriculas?search=${encodeURIComponent(value)}&page=1`, { headers: { 'Accept': 'application/json' } })
-            .then(res => res.json())
-            .then(data => {
-              renderMatriculas(data.matriculas, true);
-              const btn = document.getElementById('btn-load-more-matriculas');
-              if (btn) btn.remove();
-              if (data.hasMore) {
-                const loadMore = document.createElement('button');
-                loadMore.id = 'btn-load-more-matriculas';
-                loadMore.className = 'btn btn--outline';
-                loadMore.dataset.page = '1';
-                loadMore.textContent = 'Carregar mais';
-                loadMore.style.marginTop = '1.5rem';
-                loadMore.style.display = 'block';
-                loadMore.style.marginLeft = 'auto';
-                loadMore.style.marginRight = 'auto';
-                loadMore.onclick = loadMoreHandler;
-                list.parentNode.appendChild(loadMore);
-              }
-              loading = false;
-            });
-        }, 300);
-      });
-    }
+  <article class="enroll-card">
+    <h4 class="enroll-card__name">Gustavo Torres</h4>
+    <p class="enroll-card__meta"><strong>Data de cadastro:</strong> 24/08/2025</p>
+    <div class="enroll-card__footer">
+      <a href="#" class="btn btn--primary">Ver matrícula</a>
+    </div>
+  </article>
+</div>
 
-    function loadMoreHandler() {
-      if (loading) return;
-      loading = true;
-      const btn = document.getElementById('btn-load-more-matriculas');
-      btn.disabled = true;
-      btn.textContent = 'Carregando...';
-      page++;
-      fetch(`/admin/matriculas?search=${encodeURIComponent(lastSearch)}&page=${page}`, { headers: { 'Accept': 'application/json' } })
-        .then(res => res.json())
-        .then(data => {
-          renderMatriculas(data.matriculas, false);
-          if (data.hasMore) {
-            btn.disabled = false;
-            btn.textContent = 'Carregar mais';
-          } else {
-            btn.remove();
-          }
-          loading = false;
-        });
-    }
+  </article>
 
-    const btnLoadMore = document.getElementById('btn-load-more-matriculas');
-    if (btnLoadMore) btnLoadMore.onclick = loadMoreHandler;
-  </script>
+</main>
+
+
+
+
+
+
+  
+  
+  
+  <!-- Botão hambúrguer (mobile) -->
+  <label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
+    <span></span><span></span><span></span>
+  </label>
+
+  <!-- Overlay para fechar o menu quando aberto no mobile -->
+  <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
+
+  <!-- Scripts -->
+  <script src="matriculasScripts.js"></script>
+  <script src="adminGlobalScripts.js"></script>
+
 </body>
 </html>

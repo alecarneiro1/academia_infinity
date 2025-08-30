@@ -1,73 +1,144 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mensagens</title>
-  <link rel="stylesheet" href="/css/admin/adminStyles.css" />
-  <script src="/js/admin/adminScripts.js" defer></script>
-  <script src="/js/admin/chatlogScripts.js" defer></script>
-  <link rel="icon" type="image/png" href="/media/FAVICON.png" />
-</head>
-<body>
-  <div class="app">
-    <%- include('./partials/sidebarPartialView') %>
-    <main class="main">
-      <%- include('./partials/topbarPartialView') %>
-      <section class="container">
-        <h1 class="h1">Mensagens</h1>
-        <% if (!contact) { %>
-          <form class="chatlog-searchbox" id="chatlog-search-form" autocomplete="off" action="/admin/chatlogs" method="GET" style="position:relative;">
-            <input id="chatlog-contact-input" class="input" name="contact" type="text" placeholder="Buscar contato..." autocomplete="off" value="" style="font-size:1.2rem;">
-            <input type="hidden" id="chatlog-contact-id" name="userid" value="">
-            <div id="chatlog-dropdown" class="chatlog-dropdown" style="display:none;"></div>
-            <button type="submit" class="btn btn--primary" style="margin-top:1rem;width:100%;">Enviar</button>
-          </form>
-        <% } else { %>
-          <div class="chatlog-back-btn">
-            <a href="/admin/chatlogs" class="btn btn--outline">&larr; Voltar</a>
-          </div>
-        <% } %>
-        <% if (contact) { %>
-          <div class="chatlog-contact-label">
-            Conversa com <b><%= contact.contactname %></b>
-          </div>
-          <div class="chatlog-go-last-btn">
-            <button type="button" class="btn btn--primary" id="btn-go-last-msg">Ir para última mensagem</button>
-          </div>
-        <% } %>
-        <% if (contact) { %>
-          <div class="chatlog-chatbox" id="chatlog-chatbox">
-            <% 
-              let lastDate = null;
-              messages.forEach(m => {
-                const msgDate = m.time ? new Date(m.time).toLocaleDateString('pt-BR') : '';
-                const msgTime = m.time ? new Date(m.time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
-                if (msgDate !== lastDate) { 
-            %>
-              <div class="chatlog-date-divider"><%= msgDate %></div>
-            <% 
-                  lastDate = msgDate;
-                } 
-            %>
-              <% if (m.usermessage) { %>
-                <div class="chatlog-msg chatlog-msg-user">
-                  <div class="chatlog-bubble chatlog-bubble-user"><%= m.usermessage %></div>
-                  <div class="chatlog-time"><%= msgTime %></div>
-                </div>
-              <% } %>
-              <% if (m.agentresponse) { %>
-                <div class="chatlog-msg chatlog-msg-agent">
-                  <div class="chatlog-bubble chatlog-bubble-agent"><%= m.agentresponse %></div>
-                  <div class="chatlog-time"><%= msgTime %></div>
-                </div>
-              <% } %>
-            <% }) %>
-            <div id="last-msg"></div>
-          </div>
-        <% } %>
-      </section>
-    </main>
+<%- include('./partials/headPartialView') %>
+<%- include('./partials/headerPartialView') %>
+
+  
+
+
+
+<main class="content">
+<article class="card block" id="mensagens">
+  <header class="block__head">
+    <div>
+      <h3 class="block__title">Mensagens</h3>
+      <p class="block__subtitle">Conversa com o contato</p>
+    </div>
+  </header>
+
+
+<!-- MENSSAGENS: filtro + datepicker no MESMO box -->
+<form class="searchbox msg-filter" role="search" onsubmit="return false">
+  <!-- (opcional) linha com input, deixe se for usar busca por texto -->
+  <div class="search-row">
+    <div class="search-field">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor"
+          d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
+      </svg>
+      <input class="search-input" type="search"
+             placeholder="Pesquisar por nome..."
+             aria-label="Pesquisar mensagens" />
+    </div>
+    <button class="btn btn--primary-soft" type="submit">Buscar</button>
   </div>
+
+  <!-- Datepicker -->
+  <div class="date-picker">
+    <div class="date-picker__head">
+      <div class="date-nav">
+        <button class="date-btn" type="button" aria-label="Mês anterior">‹</button>
+        <h4 class="date-picker__title" aria-live="polite">Agosto 2025</h4>
+        <button class="date-btn" type="button" aria-label="Próximo mês">›</button>
+      </div>
+      <div class="date-head-actions">
+        <button class="btn btn--primary-soft" type="button">Todas mensagens</button>
+      </div>
+    </div>
+
+    <div class="date-picker__weekdays">
+      <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+    </div>
+
+    <!-- Marque .is-active nos dias com mensagens; .is-disabled no resto -->
+    <div class="date-picker__grid" role="grid" aria-label="Selecione uma data">
+      <button class="dp-day is-active" type="button">1</button>
+      <button class="dp-day is-disabled" type="button" disabled>2</button>
+      <button class="dp-day is-disabled" type="button" disabled>3</button>
+      <button class="dp-day is-disabled" type="button" disabled>4</button>
+      <button class="dp-day is-disabled" type="button" disabled>5</button>
+      <button class="dp-day is-disabled" type="button" disabled>6</button>
+      <button class="dp-day is-disabled" type="button" disabled>7</button>
+
+      <button class="dp-day is-disabled" type="button" disabled>8</button>
+      <button class="dp-day is-disabled" type="button" disabled>9</button>
+      <button class="dp-day is-disabled" type="button" disabled>10</button>
+      <button class="dp-day is-disabled" type="button" disabled>11</button>
+      <button class="dp-day is-disabled" type="button" disabled>12</button>
+      <button class="dp-day is-disabled" type="button" disabled>13</button>
+      <button class="dp-day is-disabled" type="button" disabled>14</button>
+
+      <button class="dp-day is-disabled" type="button" disabled>15</button>
+      <button class="dp-day is-disabled" type="button" disabled>16</button>
+      <button class="dp-day is-disabled" type="button" disabled>17</button>
+      <button class="dp-day is-disabled" type="button" disabled>18</button>
+      <button class="dp-day is-disabled" type="button" disabled>19</button>
+      <button class="dp-day is-disabled" type="button" disabled>20</button>
+      <button class="dp-day is-disabled" type="button" disabled>21</button>
+
+      <button class="dp-day is-disabled" type="button" disabled>22</button>
+      <button class="dp-day is-active" type="button">23</button>
+      <button class="dp-day is-disabled" type="button" disabled>24</button>
+      <button class="dp-day is-disabled" type="button" disabled>25</button>
+      <button class="dp-day is-disabled" type="button" disabled>26</button>
+      <button class="dp-day is-disabled" type="button" disabled>27</button>
+      <button class="dp-day is-disabled" type="button" disabled>28</button>
+
+      <button class="dp-day is-disabled" type="button" disabled>29</button>
+      <button class="dp-day is-active is-today" type="button" aria-pressed="true">30</button>
+      <button class="dp-day is-disabled" type="button" disabled>31</button>
+    </div>
+
+    <p class="picker-context">Exibindo conversa com: <strong>Alexandre Carneiro</strong></p>
+  </div>
+</form>
+
+
+  <!-- Conversa -->
+  <section class="chat" aria-live="polite">
+    <div class="chat__day">30/08/2025</div>
+
+    <div class="msg msg--in">
+      <p class="msg__text">Oi! Consegue me passar os planos e horários da academia?</p>
+      <span class="msg__time">09:12</span>
+    </div>
+
+    <div class="msg msg--out">
+      <p class="msg__text">Claro! Temos os planos Mensal, Trimestral e Anual. Quer receber um PDF com os valores e benefícios?</p>
+      <span class="msg__time">09:13</span>
+    </div>
+
+    <div class="msg msg--in">
+      <p class="msg__text">Quero sim. E vocês têm promoções para matrícula hoje?</p>
+      <span class="msg__time">09:15</span>
+    </div>
+
+    <div class="msg msg--out">
+      <p class="msg__text">Hoje temos 50% na taxa de matrícula para pagamentos no cartão ou Pix. 💳✨</p>
+      <span class="msg__time">09:16</span>
+    </div>
+
+    <div class="msg msg--in">
+      <p class="msg__text">Perfeito! Manda o link do Instagram e fotos do espaço, por favor.</p>
+      <span class="msg__time">09:18</span>
+    </div>
+  </section>
+</article>
+</main>"
+
+  
+  
+  
+  
+  <!-- Botão hambúrguer (mobile) -->
+  <label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
+    <span></span><span></span><span></span>
+  </label>
+
+  <!-- Overlay para fechar o menu quando aberto no mobile -->
+  <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
+
+  <!-- Scripts -->
+   <script src="chatlogView.ejs"></script>
+  <script src="adminGlobalScripts.js"></script>
+
 </body>
 </html>

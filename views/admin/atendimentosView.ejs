@@ -1,145 +1,80 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Atendimentos</title>
-  <link rel="stylesheet" href="/css/admin/adminStyles.css" />
-  <link rel="icon" type="image/png" href="/media/FAVICON.png" />
-  <script src="/js/admin/adminScripts.js" defer></script>
-</head>
-<body>
-  <div class="app">
-    <!-- Sidebar -->
-    <%- include('./partials/sidebarPartialView') %>
-    <!-- Main -->
-    <main class="main">
-      <%- include('./partials/topbarPartialView') %>
-      <section class="container">
-        <h1 class="h1">Atendimentos</h1>
-        <div id="atendimentos-list">
-          <% atendimentos.forEach(a => { %>
-            <div class="card" style="margin-bottom:1.2rem;">
-              <div style="font-weight:bold;font-size:1.1rem;"><%= a.subject %></div>
-              <div style="margin-top:.3rem;">
-                <b>Contato:</b> <%= a.contato %>
-              </div>
-              <div style="margin-top:.3rem;">
-                <b>Data:</b> <%= a.date ? new Date(a.date).toLocaleDateString('pt-BR') : '-' %>
-              </div>
-              <div style="margin-top:.3rem;">
-                <b>Início:</b> <%= a.start_time || '-' %> &nbsp;
-                <b>Fim:</b> <%= a.end_time || '-' %> &nbsp;
-                <b>Duração:</b> <%= a.duration_minutes ? a.duration_minutes + ' min' : '-' %>
-              </div>
-              <div style="margin-top:.7rem;">
-                <b>Resumo da conversa:</b>
-                <div style="margin-top:.2rem;white-space:pre-line;"><%= a.summary || '-' %></div>
-              </div>
-              <div style="margin-top:1.2rem;display:flex;flex-direction:column;gap:0.6rem;">
-                <a
-                  class="btn btn--primary"
-                  style="width:100%;justify-content:center;"
-                  href="https://wa.me/<%= a.contato_phone ? a.contato_phone.replace(/\D/g,'') : '' %>"
-                  target="_blank"
-                  <%= a.contato_phone ? '' : 'tabindex="-1" aria-disabled="true" style="pointer-events:none;opacity:.5;"' %>
-                >
-                  Falar com contato
-                </a>
-                <a
-                  class="btn btn--outline"
-                  style="<%= 'width:100%;justify-content:center;' + (!a.matriculaId ? 'pointer-events:none;opacity:.5;' : '') %>"
-                  href="<%= a.matriculaId ? ('/admin/matriculas/' + a.matriculaId) : '#' %>"
-                  <%= !a.matriculaId ? 'tabindex=\"-1\" aria-disabled=\"true\"' : '' %>
-                >
-                  Matrícula
-                </a>
-                <a
-                  class="btn btn--outline"
-                  style="<%= 'width:100%;justify-content:center;' + (!a.chatlogLink ? 'pointer-events:none;opacity:.5;' : '') %>"
-                  href="<%= a.chatlogLink ? a.chatlogLink.replace('/admin/chatlog/', '/admin/chatlogs/') : '#' %>"
-                  <%= !a.chatlogLink ? 'tabindex=\"-1\" aria-disabled=\"true\"' : '' %>
-                >
-                  Ver conversa
-                </a>
-              </div>
-            </div>
-          <% }) %>
-        </div>
-        <% if (hasMore) { %>
-          <div style="text-align:center;margin-top:1.5rem;">
-            <button id="btn-load-more" class="btn btn--outline" data-page="1" data-ids="<%= idsParam %>">Carregar mais</button>
-          </div>
-        <% } %>
-      </section>
-    </main>
+<%- include('./partials/headPartialView') %>
+<%- include('./partials/headerPartialView') %>
+
+  
+  
+<main class="content">
+    <article class="card block">
+  <header class="block__head">
+    <div>
+      <h3 class="block__title">Atendimentos</h3>
+      <p class="block__subtitle">Lista de atendimentos recentes</p>
+    </div>
+  </header>
+
+  <!-- Busca (mesmo estilo do card de matrícula) -->
+  <form class="searchbox ticket-search" role="search" onsubmit="return false">
+    <div class="search-row">
+      <div class="search-field">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor"
+            d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
+        </svg>
+        <input class="search-input" type="search"
+               placeholder="Pesquisar por nome…"
+               aria-label="Pesquisar atendimentos" />
+      </div>
+      <button class="btn btn--primary-soft" type="submit">Buscar</button>
+    </div>
+  </form>
+
+  <!-- LOOP: 1 card por linha -->
+  <div class="ticket-list">
+    <!-- Repita .ticket-card para cada atendimento -->
+    <article class="enroll-card ticket-card">
+      <h4 class="ticket-card__title">Consulta sobre planos e promoções na academia</h4>
+
+      <dl class="kv">
+        <dt>Contato:</dt><dd>Alexandre</dd>
+        <dt>Data:</dt><dd>28/08/2025</dd>
+        <dt>Início:</dt><dd>23:09</dd>
+        <dt>Fim:</dt><dd>23:11</dd>
+        <dt>Duração:</dt><dd>3 min</dd>
+      </dl>
+
+      <div class="summary">
+        <h5>Resumo da conversa:</h5>
+        <p>Alexandre entrou em contato para saber sobre os planos da academia, perguntou
+           sobre promoções e solicitou fotos e vídeos da academia. Também recebeu
+           informações sobre o Instagram da academia.</p>
+      </div>
+
+      <div class="btn-row">
+        <a href="#" class="btn btn--primary">Falar com o contato</a>
+        <a href="#" class="btn btn--outline-primary">Matrícula</a>
+        <a href="#" class="btn btn--outline-primary">Ver conversa</a>
+      </div>
+    </article>
+
+    <!-- …outros .ticket-card via loop… -->
   </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const btn = document.getElementById('btn-load-more');
-      if (!btn) return;
-      let page = 1;
-      const ids = btn.dataset.ids;
-      btn.addEventListener('click', function () {
-        page++;
-        btn.disabled = true;
-        btn.textContent = 'Carregando...';
-        fetch(`/admin/atendimentos/${ids ? ids : ''}?page=${page}`, { headers: { 'Accept': 'application/json' } })
-          .then(res => res.json())
-          .then(data => {
-            data.atendimentos.forEach(a => {
-              const card = document.createElement('div');
-              card.className = 'card';
-              card.style.marginBottom = '1.2rem';
-              card.innerHTML = `
-                <div style="font-weight:bold;font-size:1.1rem;">${a.subject}</div>
-                <div style="margin-top:.3rem;"><b>Contato:</b> ${a.contato}</div>
-                <div style="margin-top:.3rem;"><b>Data:</b> ${a.date ? new Date(a.date).toLocaleDateString('pt-BR') : '-'}</div>
-                <div style="margin-top:.3rem;"><b>Início:</b> ${a.start_time || '-'} &nbsp; <b>Fim:</b> ${a.end_time || '-'} &nbsp; <b>Duração:</b> ${a.duration_minutes ? a.duration_minutes + ' min' : '-'}</div>
-                <div style="margin-top:.7rem;"><b>Resumo da conversa:</b><div style="margin-top:.2rem;white-space:pre-line;">${a.summary || '-'}</div></div>
-                <div style="margin-top:1.2rem;display:flex;flex-direction:column;gap:0.6rem;">
-                  <a
-                    class="btn btn--primary"
-                    style="width:100%;justify-content:center;"
-                    href="https://wa.me/${a.contato_phone ? a.contato_phone.replace(/\D/g,'') : ''}"
-                    target="_blank"
-                    ${a.contato_phone ? '' : 'tabindex="-1" aria-disabled="true" style="pointer-events:none;opacity:.5;"'}
-                  >
-                    Falar com contato
-                  </a>
-                  <a
-                    class="btn btn--outline"
-                    style="width:100%;justify-content:center;${!a.matriculaId ? 'pointer-events:none;opacity:.5;' : ''}"
-                    href="${a.matriculaId ? `/admin/matriculas/${a.matriculaId}` : '#'}"
-                    ${!a.matriculaId ? 'tabindex="-1" aria-disabled="true"' : ''}
-                  >
-                    Matrícula
-                  </a>
-                  <a
-                    class="btn btn--outline"
-                    style="width:100%;justify-content:center;${!a.chatlogLink ? 'pointer-events:none;opacity:.5;' : ''}"
-                    href="${a.chatlogLink ? a.chatlogLink.replace('/admin/chatlog/', '/admin/chatlogs/') : '#'}"
-                    ${!a.chatlogLink ? 'tabindex="-1" aria-disabled="true"' : ''}
-                  >
-                    Ver conversa
-                  </a>
-                </div>
-              `;
-              document.getElementById('atendimentos-list').appendChild(card);
-            });
-            if (data.hasMore) {
-              btn.disabled = false;
-              btn.textContent = 'Carregar mais';
-            } else {
-              btn.remove();
-            }
-          })
-          .catch(() => {
-            btn.disabled = false;
-            btn.textContent = 'Carregar mais';
-          });
-      });
-    });
-  </script>
+</article>
+</main>
+  
+  
+  
+  
+  <!-- Botão hambúrguer (mobile) -->
+  <label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
+    <span></span><span></span><span></span>
+  </label>
+
+  <!-- Overlay para fechar o menu quando aberto no mobile -->
+  <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
+
+  <!-- Scripts -->
+   <script src="atendimentosView.ejs"></script>
+  <script src="adminGlobalScripts.js"></script>
+
 </body>
 </html>
