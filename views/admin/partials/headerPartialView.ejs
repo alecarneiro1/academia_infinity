@@ -7,16 +7,16 @@
       <img src="/media/LOGO-INF.png" alt="Logo" style="max-width: 50%; height: auto;" />
     </div>
     <nav class="sidebar__nav">
-      <a class="nav__link is-active" href="/admin/dashboard">Dashboard</a>
-      <a class="nav__link" href="/admin/agente">Agente</a>
-      <a class="nav__link" href="/admin/chatlogs">Mensagens</a>
-      <a class="nav__link" href="/admin/contatos">Contatos</a>
-      <a class="nav__link" href="/admin/atendimentos">Atendimentos</a>
-      <a class="nav__link" href="/admin/matriculas">Matrículas</a>
+      <a class="nav__link<%= activePath === '/admin/dashboard' ? ' is-active' : '' %>" href="/admin/dashboard">Dashboard</a>
+      <a class="nav__link<%= activePath === '/admin/agente' ? ' is-active' : '' %>" href="/admin/agente">Agente</a>
+      <a class="nav__link<%= activePath === '/admin/chatlogs' ? ' is-active' : '' %>" href="/admin/chatlogs">Mensagens</a>
+      <a class="nav__link<%= activePath === '/admin/contatos' ? ' is-active' : '' %>" href="/admin/contatos">Contatos</a>
+      <a class="nav__link<%= activePath === '/admin/atendimentos' ? ' is-active' : '' %>" href="/admin/atendimentos">Atendimentos</a>
+      <a class="nav__link<%= activePath === '/admin/matriculas' ? ' is-active' : '' %>" href="/admin/matriculas">Matrículas</a>
     </nav>
   </aside>
 
   <!-- Topbar fixa -->
   <header class="topbar">
-    <h1 class="topbar__title">TÍTULO DA PÁGINA</h1>
+    <h1 class="topbar__title"><%= (typeof pageTitle !== 'undefined' && pageTitle) ? pageTitle : 'Painel' %></h1>
   </header>

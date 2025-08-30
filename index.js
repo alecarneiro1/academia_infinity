@@ -9,6 +9,10 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Middleware para pageTitle e activePath - MOVER PARA ANTES DAS ROTAS
+const pageTitlesMiddleware = require('./middlewares/pageTitlesMiddleware');
+app.use(pageTitlesMiddleware);
+
 const dashboardRoutes = require('./routes/admin/dashboardRoutes');
 app.use('/admin', dashboardRoutes);
 
