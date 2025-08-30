@@ -31,6 +31,8 @@ app.use('/admin/matriculas', matriculasRoutes);
 const chatlogRoutes = require('./routes/admin/chatlogRoutes');
 app.use('/admin/chatlogs', chatlogRoutes);
 
+
+
 // ──────────────────────────────────────────────────────────
 // Básico do Express
 // ──────────────────────────────────────────────────────────

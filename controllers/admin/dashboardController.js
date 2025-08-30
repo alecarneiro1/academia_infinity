@@ -33,7 +33,7 @@ async function getDashboard(req, res) {
                 total_matriculas: kpis.total_matriculas
             } : null,
             atendimentos,
-            activePath: req.baseUrl + req.path, // Adicione esta linha
+            activePath: req.baseUrl + req.path,
             error: (!kpis ? 'Nenhum dado retornado da view v_kpidashboard.' : null)
         });
     } catch (err) {
@@ -42,17 +42,45 @@ async function getDashboard(req, res) {
     }
 }
 
-async function getDailyMessages(req, res, next) {
+// Nova função para obter métricas de mensagens
+async function getMessagesMetrics(req, res) {
     try {
-        const ndays = Number(req.query.days || 10);
-        const rows = await metricsModel.getDailyMessageCounts(ndays);
-        res.json(rows);
+        const range = (req.query.range || "today").toLowerCase();
+
+        let rows;
+        switch (range) {
+            case "today":
+            case "hoje":
+                rows = await metricsModel.getTodayMessageCounts3h();
+                break;
+            case "week":
+            case "semana":
+                rows = await metricsModel.getLast7DaysMessageCounts();
+                break;
+            case "month":
+            case "mes":
+            case "mês":
+                rows = await metricsModel.getLast30DaysMessageCounts10bins();
+                break;
+            case "year":
+            case "ano":
+                rows = await metricsModel.getLast12MonthsMessageCounts();
+                break;
+            default:
+                rows = await metricsModel.getLast7DaysMessageCounts(); // fallback "week"
+        }
+
+        const labels = rows.map(r => r.label);
+        const values = rows.map(r => Number(r.total) || 0);
+
+        res.json({ labels, values, meta: { range } });
     } catch (err) {
-        next(err);
+        console.error("metrics.getMessagesMetrics", err);
+        res.status(500).json({ error: "Falha ao carregar métricas." });
     }
 }
 
 module.exports = {
     getDashboard,
-    getDailyMessages
+    getMessagesMetrics
 };
