@@ -18,8 +18,7 @@ module.exports = (req, res, next) => {
   res.locals.activePath = activePath;
   res.locals.pageTitle = titles[activePath] || 'Painel';
 
-  // DEBUG: log para verificar se está funcionando
-  console.log('pageTitlesMiddleware:', { path: req.path, activePath, pageTitle: res.locals.pageTitle });
+
 
   next();
 };
