@@ -31,13 +31,16 @@
           <p class="block__subtitle">Distribuição diária</p>
         </div>
         <div class="filters" role="group" aria-label="Filtros de período">
-          <button class="btn btn--ghost">Hoje</button>
-          <button class="btn btn--ghost">Semana</button>
-          <button class="btn btn--ghost">Mês</button>
-          <button class="btn btn--ghost">Ano</button>
+          <button class="btn btn--ghost" data-range="today">Hoje</button>
+          <button class="btn btn--ghost" data-range="week">Semana</button>
+          <button class="btn btn--ghost" data-range="month">Mês</button>
+          <button class="btn btn--ghost" data-range="year">Ano</button>
         </div>
       </header>
-      <div class="placeholder-chart" aria-hidden="true">Gráfico (placeholder)</div>
+      <!-- Substituir o placeholder pelo canvas -->
+      <div class="chart" style="height: 400px; width: 100%; max-width: 100%;">
+        <canvas id="messagesChart" height="400" style="width:100%;max-width:100%;display:block;"></canvas>
+      </div>
     </section>
 
     <!-- Tabela -->
@@ -94,7 +97,9 @@
   <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
 
   <!-- Scripts -->
-  <script src="adminGlobalScripts.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/js/admin/dashboardScripts.js"></script>
 
 </body>
 </html>

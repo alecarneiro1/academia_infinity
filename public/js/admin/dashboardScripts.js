@@ -1,57 +1,94 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // Gráfico de mensagens diárias
+  // Gráfico de mensagens 
   const chartEl = document.getElementById('messagesChart');
-  if (chartEl) {
-    fetch('/admin/api/messages/daily?days=10')
-      .then(res => res.json())
-      .then(data => {
-        const labels = data.map(item => {
-          // Formata para dd/MM
-          const d = new Date(item.dia);
-          return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-        });
-        const values = data.map(item => Number(item.total));
-        // eslint-disable-next-line no-undef
-        new Chart(chartEl.getContext('2d'), {
-          type: 'bar',
-          data: {
-            labels,
-            datasets: [{
-              label: 'Mensagens',
-              data: values,
-              backgroundColor: 'rgba(225,29,72,0.7)',
-              borderColor: 'rgba(225,29,72,1)',
-              borderWidth: 2,
-              borderRadius: 6,
-              maxBarThickness: 18,
-              categoryPercentage: 0.9,
-              barPercentage: 0.9,
-            }]
-          },
-          options: {
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                backgroundColor: '#151923',
-                titleColor: '#e11d48',
-                bodyColor: '#e7e9ee',
-                borderColor: 'rgba(225,29,72,0.5)',
-                borderWidth: 1,
-              }
+  let messagesChart = null;
+  
+  function loadChart(range = 'week') {
+    if (chartEl) {
+      fetch(`/admin/dashboard/messages-metrics?range=${range}`)
+        .then(res => res.json())
+        .then(data => {
+          // Garante que o canvas sempre ocupe 100% da largura
+          chartEl.style.width = '100%';
+          chartEl.style.maxWidth = '100%';
+          chartEl.style.display = 'block';
+          chartEl.height = 400;
+
+          const config = {
+            type: 'line',
+            data: {
+              labels: data.labels,
+              datasets: [{
+                label: 'Mensagens',
+                data: data.values,
+                backgroundColor: 'rgba(225,29,72,0.2)',
+                borderColor: 'rgba(225,29,72,1)',
+                borderWidth: 2,
+                tension: 0.3,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: 'rgba(225,29,72,1)',
+                pointRadius: 4,
+                fill: true
+              }]
             },
-            scales: {
-              x: {
-                grid: { display: false },
-                ticks: { color: '#e7e9ee', font: { family: "'Inter', 'Segoe UI', Arial, sans-serif" } }
+            options: {
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  backgroundColor: '#151923',
+                  titleColor: '#e11d48',
+                  bodyColor: '#e7e9ee',
+                  borderColor: 'rgba(225,29,72,0.5)',
+                  borderWidth: 1,
+                  padding: 10,
+                  displayColors: false
+                }
               },
-              y: {
-                grid: { color: 'rgba(225,29,72,0.08)' },
-                ticks: { color: '#e7e9ee', font: { family: "'Inter', 'Segoe UI', Arial, sans-serif" } },
-                beginAtZero: true
+              maintainAspectRatio: false,
+              responsive: true,
+              scales: {
+                x: {
+                  grid: { display: false, drawBorder: false },
+                  ticks: { color: '#9aa3af' }
+                },
+                y: {
+                  grid: { color: 'rgba(255,255,255,0.05)' },
+                  ticks: { color: '#9aa3af' },
+                  beginAtZero: true
+                }
               }
             }
+          };
+          
+          // Destruir gráfico anterior se existir
+          if (messagesChart) {
+            messagesChart.destroy();
           }
+          
+          // Criar novo gráfico
+          messagesChart = new Chart(chartEl, config);
+        })
+        .catch(error => {
+          console.error('Erro ao carregar dados do gráfico:', error);
         });
-      });
+    }
   }
+  
+  // Botões de filtro
+  const filterButtons = document.querySelectorAll('.filters [data-range]');
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Remove classe ativa de todos os botões
+      filterButtons.forEach(b => b.classList.remove('is-active'));
+      // Adiciona classe ativa ao botão clicado
+      this.classList.add('is-active');
+      // Carrega gráfico com o range especificado
+      loadChart(this.dataset.range);
+    });
+  });
+  
+  // Carrega o gráfico inicial (semana)
+  loadChart('week');
+  // Marca o botão da semana como ativo inicialmente
+  document.querySelector('[data-range="week"]')?.classList.add('is-active');
 });

@@ -36,9 +36,16 @@ exports.updateInfo = async (req, res) => {
             return res.status(400).send('Campo conteudo é obrigatório');
         }
         await Info.update({ conteudo }, { where: { id } });
+        // AJAX: responde 200 OK sem redirect
+        if (req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest') {
+            return res.status(200).end();
+        }
         res.redirect('/admin/agente');
     } catch (err) {
         console.error('Erro ao atualizar info:', err);
+        if (req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest') {
+            return res.status(400).send(err.message || 'Erro ao atualizar informação');
+        }
         res.status(500).send('Erro ao atualizar informação');
     }
 };
