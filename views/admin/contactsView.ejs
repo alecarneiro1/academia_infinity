@@ -33,7 +33,7 @@
                   <a
                     class="btn btn--outline"
                     style="<%= 'width:100%;justify-content:center;' + (!c.matriculaId ? 'pointer-events:none;opacity:.5;' : '') %>"
-                    href="<%= c.matriculaId ? `/admin/matriculas/${c.matriculaId}` : '#' %>"
+                    href="<%= c.matriculaId ? ('/admin/matriculas/' + c.matriculaId) : '#' %>"
                     <%= !c.matriculaId ? 'tabindex=-1 aria-disabled=true' : '' %>
                   >
                     Matrícula
@@ -41,7 +41,7 @@
                   <a
                     class="btn btn--outline"
                     style="<%= 'width:100%;justify-content:center;' + (!(c.atendimentoIds && c.atendimentoIds.length) ? 'pointer-events:none;opacity:.5;' : '') %>"
-                    href="<%= (c.atendimentoIds && c.atendimentoIds.length) ? `/admin/atendimentos/${c.atendimentoIds.join(',')}` : '#' %>"
+                    href="<%= (c.atendimentoIds && c.atendimentoIds.length) ? ('/admin/atendimentos/' + c.atendimentoIds.join(',')) : '#' %>"
                     <%= !(c.atendimentoIds && c.atendimentoIds.length) ? 'tabindex=-1 aria-disabled=true' : '' %>
                   >
                     Atendimentos

@@ -26,7 +26,7 @@
                 <b>Data de cadastro:</b> <%= m.submitted_at ? new Date(m.submitted_at).toLocaleDateString('pt-BR') : '-' %>
               </div>
               <div style="margin-top:1rem;">
-                <a class="btn btn--outline" href="/admin/matriculas/<%= m.id %>">Ver dados</a>
+                <a class="btn btn--outline" href="<%= '/admin/matriculas/' + m.id %>">Ver dados</a>
               </div>
             </div>
           <% }) %>
