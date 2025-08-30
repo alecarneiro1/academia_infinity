@@ -7,19 +7,19 @@
     <section class="kpis" aria-label="Indicadores">
       <article class="card kpi">
         <h2 class="kpi__label">Mensagens</h2>
-        <div class="kpi__value">264</div>
+        <div class="kpi__value"><%= (kpis && kpis.total_mensages !== undefined) ? kpis.total_mensages : '0' %></div>
       </article>
       <article class="card kpi">
         <h2 class="kpi__label">Contatos</h2>
-        <div class="kpi__value">125</div>
+        <div class="kpi__value"><%= (kpis && kpis.total_contacts !== undefined) ? kpis.total_contacts : '0' %></div>
       </article>
       <article class="card kpi">
         <h2 class="kpi__label">Atendimentos</h2>
-        <div class="kpi__value">125</div>
+        <div class="kpi__value"><%= (kpis && kpis.total_summaries !== undefined) ? kpis.total_summaries : '0' %></div>
       </article>
       <article class="card kpi">
         <h2 class="kpi__label">Matrículas</h2>
-        <div class="kpi__value">125</div>
+        <div class="kpi__value"><%= (kpis && kpis.total_matriculas !== undefined) ? kpis.total_matriculas : '0' %></div>
       </article>
     </section>
 
@@ -60,11 +60,20 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td>#1025</td><td>Dúvida sobre planos</td><td>Marina P.</td><td>28/08/2025 09:41</td></tr>
-            <tr><td>#1024</td><td>Cancelamento</td><td>Rafael L.</td><td>28/08/2025 09:10</td></tr>
-            <tr><td>#1023</td><td>Agendamento avaliação</td><td>Bianca S.</td><td>28/08/2025 08:55</td></tr>
-            <tr><td>#1022</td><td>Troca de plano</td><td>Gustavo T.</td><td>28/08/2025 08:20</td></tr>
-            <tr><td>#1021</td><td>Acesso ao app</td><td>Camila R.</td><td>28/08/2025 07:58</td></tr>
+            <% if (atendimentos && atendimentos.length > 0) { %>
+              <% atendimentos.forEach(a => { %>
+                <tr>
+                  <td>#<%= a.id %></td>
+                  <td><%= a.assunto %></td>
+                  <td><%= a.contato %></td>
+                  <td><%= a.data ? new Date(a.data).toLocaleDateString('pt-BR') + ' ' + new Date(a.data).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}) : '-' %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="4" style="text-align:center;">Nenhum atendimento encontrado</td>
+              </tr>
+            <% } %>
           </tbody>
         </table>
       </div>
