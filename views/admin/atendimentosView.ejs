@@ -1,80 +1,80 @@
 <%- include('./partials/headPartialView') %>
 <%- include('./partials/headerPartialView') %>
 
-  
-  
 <main class="content">
-    <article class="card block">
-  <header class="block__head">
-    <div>
-      <h3 class="block__title">Atendimentos</h3>
-      <p class="block__subtitle">Lista de atendimentos recentes</p>
+  <article class="card block">
+    <header class="block__head">
+      <div>
+        <h3 class="block__title">Atendimentos</h3>
+        <p class="block__subtitle">Lista de atendimentos recentes</p>
+      </div>
+    </header>
+
+    <form class="searchbox ticket-search" id="atendimentos-search-form" role="search" onsubmit="return false">
+      <div class="search-row">
+        <div class="search-field">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor"
+              d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
+          </svg>
+          <input class="search-input" id="atendimentos-search-input" type="search"
+                 placeholder="Pesquisar por nome…"
+                 aria-label="Pesquisar atendimentos" />
+        </div>
+      </div>
+    </form>
+
+    <% if (contactInfo) { %>
+      <div style="margin: 1rem 0 1.5rem; color: var(--muted); font-size: 1.1rem;">
+        Mostrando atendimentos para: <strong><%= contactInfo.contactname %> (<%= contactInfo.contactphone %>)</strong>
+      </div>
+    <% } %>
+
+    <div class="ticket-list" id="atendimentos-list">
+      <% if (!atendimentos || atendimentos.length === 0) { %>
+        <div id="atendimentos-empty-msg" style="color:var(--muted);padding:2rem;text-align:center;">
+          Busque um atendimento para visualizar os dados.
+        </div>
+      <% } else { %>
+        <% atendimentos.forEach(function(a) { %>
+          <article class="enroll-card ticket-card">
+            <h4 class="ticket-card__title"><%= a.subject %></h4>
+            <dl class="kv">
+              <dt>Contato:</dt><dd><%= a.contato %></dd>
+              <dt>Data:</dt><dd><%= a.date ? new Date(a.date).toLocaleDateString('pt-BR') : '-' %></dd>
+              <dt>Início:</dt><dd><%= a.start_time || '-' %></dd>
+              <dt>Fim:</dt><dd><%= a.end_time || '-' %></dd>
+              <dt>Duração:</dt><dd><%= a.duration_minutes ? a.duration_minutes + ' min' : '-' %></dd>
+            </dl>
+            <div class="summary">
+              <h5>Resumo da conversa:</h5>
+              <p><%= a.summary || '-' %></p>
+            </div>
+            <div class="btn-row">
+              <% if (a.contato_phone) { %>
+                <a href="https://wa.me/<%= a.contato_phone.replace(/\D/g,'') %>" target="_blank" class="btn btn--primary">Falar com o contato</a>
+              <% } %>
+              <% if (a.matriculaId) { %>
+                <a href="#" class="btn btn--outline-primary btn-matricula" data-matricula-id="<%= a.matriculaId %>">Matrícula</a>
+              <% } %>
+              <% if (a.chatlogLink) { %>
+                <a href="<%= a.chatlogLink %>" class="btn btn--outline-primary" target="_blank">Ver conversa</a>
+              <% } %>
+            </div>
+          </article>
+        <% }) %>
+      <% } %>
     </div>
-  </header>
-
-  <!-- Busca (mesmo estilo do card de matrícula) -->
-  <form class="searchbox ticket-search" role="search" onsubmit="return false">
-    <div class="search-row">
-      <div class="search-field">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor"
-            d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
-        </svg>
-        <input class="search-input" type="search"
-               placeholder="Pesquisar por nome…"
-               aria-label="Pesquisar atendimentos" />
-      </div>
-      <button class="btn btn--primary-soft" type="submit">Buscar</button>
-    </div>
-  </form>
-
-  <!-- LOOP: 1 card por linha -->
-  <div class="ticket-list">
-    <!-- Repita .ticket-card para cada atendimento -->
-    <article class="enroll-card ticket-card">
-      <h4 class="ticket-card__title">Consulta sobre planos e promoções na academia</h4>
-
-      <dl class="kv">
-        <dt>Contato:</dt><dd>Alexandre</dd>
-        <dt>Data:</dt><dd>28/08/2025</dd>
-        <dt>Início:</dt><dd>23:09</dd>
-        <dt>Fim:</dt><dd>23:11</dd>
-        <dt>Duração:</dt><dd>3 min</dd>
-      </dl>
-
-      <div class="summary">
-        <h5>Resumo da conversa:</h5>
-        <p>Alexandre entrou em contato para saber sobre os planos da academia, perguntou
-           sobre promoções e solicitou fotos e vídeos da academia. Também recebeu
-           informações sobre o Instagram da academia.</p>
-      </div>
-
-      <div class="btn-row">
-        <a href="#" class="btn btn--primary">Falar com o contato</a>
-        <a href="#" class="btn btn--outline-primary">Matrícula</a>
-        <a href="#" class="btn btn--outline-primary">Ver conversa</a>
-      </div>
-    </article>
-
-    <!-- …outros .ticket-card via loop… -->
-  </div>
-</article>
+  </article>
 </main>
-  
-  
-  
-  
-  <!-- Botão hambúrguer (mobile) -->
-  <label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
-    <span></span><span></span><span></span>
-  </label>
 
-  <!-- Overlay para fechar o menu quando aberto no mobile -->
-  <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
+<!-- Botão hambúrguer (mobile) -->
+<label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
+  <span></span><span></span><span></span>
+</label>
+<label for="nav-toggle" class="overlay" aria-hidden="true"></label>
 
-  <!-- Scripts -->
-   <script src="atendimentosView.ejs"></script>
-  <script src="adminGlobalScripts.js"></script>
-
+<script src="/js/admin/atendimentosScripts.js"></script>
+<script src="/js/admin/adminGlobalScripts.js"></script>
 </body>
 </html>

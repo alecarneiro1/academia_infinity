@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('contacts-search-form');
-  const input = document.getElementById('contacts-search-input');
-  const userList = document.getElementById('user-list');
+  const input = document.getElementById('atendimentos-search-input');
+  const list = document.getElementById('atendimentos-list');
 
   function escapeHtml(s) {
     return String(s || '').replace(/[&<>"']/g, ch => ({
@@ -57,50 +56,63 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  function renderContacts(contacts, searchTerm) {
+  function renderAtendimentos(atendimentos, searchTerm, contactInfo) {
     // Fade out antigos
-    userList.querySelectorAll('.user-card').forEach(card => {
+    list.querySelectorAll('.ticket-card').forEach(card => {
       card.classList.add('fade-out');
     });
     setTimeout(() => {
-      userList.innerHTML = '';
-      if (!contacts.length) {
+      list.innerHTML = '';
+      if (contactInfo) {
+        list.innerHTML += `<div style="margin: 1rem 0 1.5rem; color: var(--muted); font-size: 1.1rem;">
+          Mostrando atendimentos para: <strong>${escapeHtml(contactInfo.contactname)} (${escapeHtml(contactInfo.contactphone)})</strong>
+        </div>`;
+      }
+      if (!atendimentos.length) {
         let msg = '';
         if (searchTerm && searchTerm.length > 0) {
-          msg = 'Nenhum contato encontrado para sua busca.';
+          msg = 'Nenhum atendimento encontrado para sua busca.';
         } else {
-          msg = 'Busque um contato para visualizar os dados.';
+          msg = 'Busque um atendimento para visualizar os dados.';
         }
-        userList.innerHTML = `<div id="contacts-empty-msg" style="color:var(--muted);padding:2rem;text-align:center;">${msg}</div>`;
+        list.innerHTML += `<div id="atendimentos-empty-msg" style="color:var(--muted);padding:2rem;text-align:center;">${msg}</div>`;
         return;
       }
-      contacts.forEach(c => {
+      atendimentos.forEach(a => {
         const card = document.createElement('article');
-        card.className = 'enroll-card user-card fade-in';
+        card.className = 'enroll-card ticket-card fade-in';
         card.innerHTML = `
-          <h4 class="user-card__name">${escapeHtml(c.contactname)}</h4>
-          <p class="user-card__phone"><strong>WhatsApp:</strong> ${escapeHtml(c.contactphone || '')}</p>
-          <div class="user-actions">
-            <a href="#" class="btn btn--primary">Falar com contato</a>
-            ${c.matriculaId ? `<a href="#" class="btn btn--outline-primary btn-matricula" data-matricula-id="${c.matriculaId}">Matrícula</a>` : ''}
-            ${(c.atendimentoIds && c.atendimentoIds.length) ? `<a href="/admin/atendimentos/${c.id}" class="btn btn--outline-primary">Atendimentos</a>` : ''}
+          <h4 class="ticket-card__title">${escapeHtml(a.subject)}</h4>
+          <dl class="kv">
+            <dt>Contato:</dt><dd>${escapeHtml(a.contato)}</dd>
+            <dt>Data:</dt><dd>${a.date ? new Date(a.date).toLocaleDateString('pt-BR') : '-'}</dd>
+            <dt>Início:</dt><dd>${escapeHtml(a.start_time || '-')}</dd>
+            <dt>Fim:</dt><dd>${escapeHtml(a.end_time || '-')}</dd>
+            <dt>Duração:</dt><dd>${a.duration_minutes ? a.duration_minutes + ' min' : '-'}</dd>
+          </dl>
+          <div class="summary">
+            <h5>Resumo da conversa:</h5>
+            <p>${escapeHtml(a.summary || '-')}</p>
+          </div>
+          <div class="btn-row">
+            ${a.contato_phone ? `<a href="https://wa.me/${a.contato_phone.replace(/\D/g,'')}" target="_blank" class="btn btn--primary">Falar com o contato</a>` : ''}
+            ${a.matriculaId ? `<a href="#" class="btn btn--outline-primary btn-matricula" data-matricula-id="${a.matriculaId}">Matrícula</a>` : ''}
+            ${a.chatlogLink ? `<a href="${a.chatlogLink}" class="btn btn--outline-primary">Ver conversa</a>` : ''}
           </div>
         `;
-        userList.appendChild(card);
+        list.appendChild(card);
         setTimeout(() => card.classList.remove('fade-in'), 400);
       });
-
-      // Handler para abrir modal da matrícula (para novos cards)
-      attachMatriculaModalHandlers(userList);
+      attachMatriculaModalHandlers(list);
     }, 220);
   }
 
   // Busca AJAX
   function doSearch(q) {
-    fetch(`/admin/contatos/search?q=${encodeURIComponent(q)}`)
+    fetch(`/admin/atendimentos?search=${encodeURIComponent(q)}`, { headers: { accept: 'application/json' } })
       .then(res => res.json())
-      .then(data => renderContacts(data.contacts || [], q))
-      .catch(() => renderContacts([], q));
+      .then(data => renderAtendimentos(data.atendimentos || [], q, data.contactInfo))
+      .catch(() => renderAtendimentos([], q));
   }
 
   // Debounce
@@ -110,23 +122,18 @@ document.addEventListener('DOMContentLoaded', function () {
     debounceT = setTimeout(() => doSearch(q), 180);
   }
 
-  if (input && form && userList) {
+  if (input && list) {
     input.addEventListener('input', function () {
       const q = input.value.trim();
       if (!q) {
-        // Se vazio, recarrega a página para SSR mostrar todos os contatos
-        window.location.reload();
+        window.location.href = '/admin/atendimentos';
       } else {
         debounceSearch(q);
       }
     });
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const q = input.value.trim();
-      if (q) debounceSearch(q);
-    });
+    // Enter no input não faz nada (busca é instantânea)
   }
 
-  // --- NOVO: ao carregar a página, atacha handlers nos cards SSR ---
-  attachMatriculaModalHandlers(userList);
+  // Atacha handlers nos cards SSR ao carregar
+  attachMatriculaModalHandlers(list);
 });

@@ -10,10 +10,22 @@ exports.listAtendimentos = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const idsParam = req.params.ids;
     let where = {};
+    let contactInfo = null;
+
     if (idsParam) {
-      const ids = idsParam.split(',').map(Number).filter(Boolean);
-      where.id = { [Op.in]: ids };
+      // idsParam pode ser id do contato OU lista de ids de atendimento
+      const userId = Number(idsParam);
+      if (!isNaN(userId)) {
+        where.contact = userId;
+        // Busca info do contato para mostrar contexto
+        contactInfo = await Contact.findByPk(userId);
+      } else {
+        // fallback: lista de atendimentos por id
+        const ids = idsParam.split(',').map(Number).filter(Boolean);
+        where.id = { [Op.in]: ids };
+      }
     }
+
     const { count, rows } = await Summary.findAndCountAll({
       where,
       order: [['id', 'DESC']],
@@ -40,16 +52,12 @@ exports.listAtendimentos = async (req, res) => {
 
     // Monta dados para view
     const atendimentos = rows.map(a => {
-      // Extrai ids do chatid (array ou string com {})
       let chatIds = [];
       if (Array.isArray(a.chatid)) {
         chatIds = a.chatid.map(id => String(id).replace(/[{}]/g, ''));
       } else if (typeof a.chatid === 'string') {
         chatIds = a.chatid.replace(/[{}]/g, '').split(',').map(s => s.trim()).filter(Boolean);
       }
-      const chatlogLink = (a.contact && chatIds.length)
-        ? `/admin/chatlog/${a.contact}/${chatIds.join(',')}`
-        : null;
       return {
         id: a.id,
         subject: a.subject,
@@ -61,7 +69,9 @@ exports.listAtendimentos = async (req, res) => {
         duration_minutes: a.duration_minutes,
         summary: a.summary,
         matriculaId: matriculaMap[a.contact] || null,
-        chatlogLink
+        chatlogLink: (a.contact && chatIds.length)
+          ? `/admin/chatlogs/${a.contact}/${chatIds.join(',')}`
+          : null
       };
     });
 
@@ -74,6 +84,7 @@ exports.listAtendimentos = async (req, res) => {
       atendimentos,
       hasMore: (page * PAGE_SIZE) < count,
       idsParam: idsParam || '',
+      contactInfo,
       activePath: '/admin/atendimentos'
     });
   } catch (err) {
