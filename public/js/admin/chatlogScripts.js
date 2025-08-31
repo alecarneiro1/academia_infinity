@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const btn = Array.from(datepickerGrid.querySelectorAll('.dp-day')).find(b => b.textContent.trim() === String(Number(dd)));
                     if (btn) {
                       btn.classList.add('is-selected');
-                      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      
                     }
                   }, 20);
                 }
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(data => {
         renderMessages(data.messages || [], contactName, all, dayStr);
         // scroll to messages
-        chatMessages.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
       })
       .catch(err => {
         console.error('Erro ao carregar mensagens:', err);
