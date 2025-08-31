@@ -18,6 +18,10 @@ a {
   --header-h: 64px;
   --sidebar-w: 260px;
   --shadow: 0 10px 30px rgba(0,0,0,.25);
+
+  /* Tokens de fonte para chat/bubbles */
+  --fs-chat: 0.95rem;
+  --lh-chat: 1.5;
 }
 
 /* =========================
@@ -33,6 +37,18 @@ body{
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- trava de autosize mobile --- */
+html{
+  -webkit-text-size-adjust: 100%; /* iOS Safari */
+  text-size-adjust: 100%;         /* padrão/Chrome */
+}
+@supports (-webkit-touch-callout: none){
+  html{ -webkit-text-size-adjust: 100% !important; }
+}
+@media (orientation: landscape) and (max-width: 900px){
+  html{ -webkit-text-size-adjust: 100%; }
 }
 
 /* =========================
