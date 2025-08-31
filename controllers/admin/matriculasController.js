@@ -55,3 +55,19 @@ exports.singleMatricula = async (req, res) => {
     res.status(500).send('Erro ao buscar matrícula');
   }
 };
+
+exports.getMatricula = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const matricula = await Matricula.findByPk(id);
+    if (req.query.json == '1') {
+      if (!matricula) return res.json({ matricula: null });
+      return res.json({ matricula });
+    }
+    // ...renderização normal da view...
+    res.render('admin/matriculasSingleView', { matricula });
+  } catch (err) {
+    if (req.query.json == '1') return res.json({ matricula: null });
+    res.status(500).send('Erro ao buscar matrícula');
+  }
+};

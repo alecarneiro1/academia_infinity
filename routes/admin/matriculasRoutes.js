@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const matriculasController = require('../../controllers/admin/matriculasController');
 
-router.get('/', matriculasController.listMatriculas);
-router.get('/:id', matriculasController.singleMatricula);
+router.get('/:id', matriculasController.getMatricula);
 
+module.exports = router;
 module.exports = router;
