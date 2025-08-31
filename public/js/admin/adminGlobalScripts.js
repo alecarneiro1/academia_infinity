@@ -75,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Estado inicial: escondida à esquerda
   sidebar.style.transform = 'translateX(-100%)';
 
-
   navToggle.addEventListener('change', function() {
     if (navToggle.checked) {
       // Abrir: anima da esquerda para a direita
@@ -140,3 +139,4 @@ document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
 })();
+

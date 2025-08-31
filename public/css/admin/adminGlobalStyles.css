@@ -52,8 +52,8 @@ body{
   display: flex;
   flex-direction: column;
   gap: 16px;
-  transform: translateY(100%);           /* escondida no mobile (desce do rodapé) */
-  transition: transform .28s ease;
+  transform: translateX(-100%);           /* escondida à esquerda */
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
   z-index: 40;
 }
 .sidebar__logo{
@@ -84,7 +84,7 @@ body{
 
 /* Sidebar visível quando toggle marcado (mobile) */
 .nav-toggle:checked ~ .sidebar{
-  transform: translateY(0);
+  transform: translateX(0);
 }
 
 /* Topbar */
@@ -603,13 +603,15 @@ body{
   justify-content: center;
 }
 
-
-
-
-
-
-
-
+/* Fade-in/out para cards de usuário */
+.user-card.fade-in {
+  opacity: 0;
+  animation: msg-fadein 0.38s cubic-bezier(.4,0,.2,1) forwards;
+}
+.user-card.fade-out {
+  opacity: 1;
+  animation: msg-fadeout 0.28s cubic-bezier(.4,0,.2,1) forwards;
+}
 
 
 
