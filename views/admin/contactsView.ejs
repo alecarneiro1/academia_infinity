@@ -36,7 +36,8 @@
           <div class="user-actions">
             <a href="#" class="btn btn--primary">Falar com contato</a>
             <% if (c.matriculaId) { %>
-              <a href="/admin/matriculas/<%= c.matriculaId %>" class="btn btn--outline-primary">Matrícula</a>
+              <!-- Corrigido: botão para modal, não link direto -->
+              <a href="#" class="btn btn--outline-primary btn-matricula" data-matricula-id="<%= c.matriculaId %>">Matrícula</a>
             <% } %>
             <% if (c.atendimentoIds && c.atendimentoIds.length) { %>
               <a href="/admin/atendimentos?contact=<%= c.id %>" class="btn btn--outline-primary">Atendimentos</a>

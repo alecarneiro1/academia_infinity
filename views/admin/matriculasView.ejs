@@ -1,12 +1,6 @@
 <%- include('./partials/headPartialView') %>
 <%- include('./partials/headerPartialView') %>
 
-  
-  
-  
-  
-
-
 <main class="content">
   <article class="card block">
     <header class="block__head">
@@ -16,49 +10,55 @@
       </div>
     </header>
     <form class="searchbox" role="search" onsubmit="return false">
-  <div class="search-row">
-    <div class="search-field">
-      <!-- ícone -->
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill="currentColor"
-          d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
-      </svg>
-      <input
-        class="search-input"
-        type="search"
-        placeholder="Pesquisar por nome…"
-        aria-label="Pesquisar matrículas" />
-    </div>
-
-    <button class="btn btn--primary-soft" type="submit">Buscar</button>
-  </div>
-</form>
-   <div class="enroll-list">
-  <!-- LOOP: repita este bloco para cada matrícula -->
-  <article class="enroll-card">
-    <h4 class="enroll-card__name">Alexandre Carneiro Sloboda</h4>
-    <p class="enroll-card__meta"><strong>Data de cadastro:</strong> 26/08/2025</p>
-    <div class="enroll-card__footer">
-      <a href="#" class="btn btn--primary">Ver matrícula</a>
-    </div>
-  </article>
-
-  <!-- exemplos extras (remova depois e mantenha só o loop) -->
-  <article class="enroll-card">
-    <h4 class="enroll-card__name">Marina Pereira</h4>
-    <p class="enroll-card__meta"><strong>Data de cadastro:</strong> 25/08/2025</p>
-    <div class="enroll-card__footer">
-      <a href="#" class="btn btn--primary">Ver matrícula</a>
-    </div>
-  </article>
-
-  <article class="enroll-card">
-    <h4 class="enroll-card__name">Gustavo Torres</h4>
-    <p class="enroll-card__meta"><strong>Data de cadastro:</strong> 24/08/2025</p>
-    <div class="enroll-card__footer">
-      <a href="#" class="btn btn--primary">Ver matrícula</a>
+      <div class="search-row">
+        <div class="search-field">
+          <!-- ícone -->
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor"
+              d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
+          </svg>
+          <input
+            class="search-input"
+            id="matriculas-search-input"
+            type="search"
+            placeholder="Pesquisar por nome…"
+            aria-label="Pesquisar matrículas" />
+        </div>
+        <!-- Removido o botão Buscar -->
+      </div>
+    </form>
+    <div class="enroll-list" id="matriculas-list">
+      <% if (!matriculas || matriculas.length === 0) { %>
+        <div id="matriculas-empty-msg" style="color:var(--muted);padding:2rem;text-align:center;">
+          Busque uma matrícula para visualizar os dados.
+        </div>
+      <% } else { %>
+        <% matriculas.forEach(function(m) { %>
+          <article class="enroll-card">
+            <h4 class="enroll-card__name"><%= m.nome_completo %></h4>
+            <p class="enroll-card__meta"><strong>Data de cadastro:</strong> <%= m.submitted_at ? new Date(m.submitted_at).toLocaleDateString('pt-BR') : '-' %></p>
+            <div class="enroll-card__footer">
+              <a href="#" class="btn btn--primary btn-ver-matricula" data-id="<%= m.id %>">Ver matrícula</a>
+            </div>
+          </article>
+        <% }) %>
+      <% } %>
     </div>
   </article>
+</main>
+
+<!-- Botão hambúrguer (mobile) -->
+<label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
+  <span></span><span></span><span></span>
+</label>
+<!-- Overlay para fechar o menu quando aberto no mobile -->
+<label for="nav-toggle" class="overlay" aria-hidden="true"></label>
+
+<!-- Scripts -->
+<script src="/js/admin/matriculasScripts.js"></script>
+<script src="/js/admin/adminGlobalScripts.js"></script>
+</body>
+</html>
 </div>
 
   </article>
@@ -82,8 +82,8 @@
   <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
 
   <!-- Scripts -->
-  <script src="matriculasScripts.js"></script>
-  <script src="adminGlobalScripts.js"></script>
+  <script src="/js/admin/matriculasScripts.js"></script>
+  <script src="/js/admin/adminGlobalScripts.js"></script>
 
 </body>
 </html>

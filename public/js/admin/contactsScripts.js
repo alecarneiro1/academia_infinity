@@ -9,6 +9,54 @@ document.addEventListener('DOMContentLoaded', function () {
     })[ch]);
   }
 
+  function attachMatriculaModalHandlers(context) {
+    (context || document).querySelectorAll('.btn-matricula').forEach(btn => {
+      btn.onclick = null;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const matriculaId = btn.getAttribute('data-matricula-id');
+        if (!matriculaId) return;
+        btn.disabled = true;
+        btn.textContent = 'Carregando...';
+        fetch(`/admin/matriculas/${matriculaId}?json=1`)
+          .then(res => res.json())
+          .then(data => {
+            btn.disabled = false;
+            btn.textContent = 'Matrícula';
+            if (!data || !data.matricula) {
+              window.openModal('<div style="padding:2rem;text-align:center;">Matrícula não encontrada.</div>');
+              return;
+            }
+            const m = data.matricula;
+            window.openModal(`
+              <div style="max-width:420px">
+                <h3 style="margin:0 0 1rem 0;">Matrícula de ${escapeHtml(m.nome_completo || '')}</h3>
+                <div style="font-size:15px;line-height:1.7;">
+                  <strong>Plano:</strong> ${escapeHtml(m.plano || '-')}<br>
+                  <strong>WhatsApp:</strong> ${escapeHtml(m.whatsapp || '-')}<br>
+                  <strong>Data de nascimento:</strong> ${escapeHtml(m.data_nascimento || '-')}<br>
+                  <strong>Endereço:</strong> ${escapeHtml(m.endereco || '-')}<br>
+                  <strong>CEP:</strong> ${escapeHtml(m.cep || '-')}<br>
+                  <strong>CPF:</strong> ${escapeHtml(m.cpf || '-')}<br>
+                  <strong>Objetivo:</strong> ${escapeHtml(m.objetivo || '-')}<br>
+                  <strong>Origem:</strong> ${escapeHtml(m.origem || '-')}<br>
+                  <strong>Data de cadastro:</strong> ${m.submitted_at ? new Date(m.submitted_at).toLocaleDateString('pt-BR') : '-'}
+                </div>
+                <div style="margin-top:1.5rem;text-align:right;">
+                  <button class="btn btn--primary" onclick="window.closeModal()">Fechar</button>
+                </div>
+              </div>
+            `);
+          })
+          .catch(() => {
+            btn.disabled = false;
+            btn.textContent = 'Matrícula';
+            window.openModal('<div style="padding:2rem;text-align:center;">Erro ao buscar matrícula.</div>');
+          });
+      });
+    });
+  }
+
   function renderContacts(contacts, searchTerm) {
     // Fade out antigos
     userList.querySelectorAll('.user-card').forEach(card => {
@@ -42,49 +90,8 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => card.classList.remove('fade-in'), 400);
       });
 
-      // Handler para abrir modal da matrícula
-      userList.querySelectorAll('.btn-matricula').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-          e.preventDefault();
-          const matriculaId = btn.getAttribute('data-matricula-id');
-          if (!matriculaId) return;
-          btn.disabled = true;
-          btn.textContent = 'Carregando...';
-          fetch(`/admin/matriculas/${matriculaId}?json=1`)
-            .then(res => res.json())
-            .then(data => {
-              btn.disabled = false;
-              btn.textContent = 'Matrícula';
-              if (!data || !data.matricula) {
-                window.openModal('<div style="padding:2rem;text-align:center;">Matrícula não encontrada.</div>');
-                return;
-              }
-              const m = data.matricula;
-              window.openModal(`
-                <div style="max-width:420px">
-                  <h3 style="margin:0 0 1rem 0;">Matrícula de ${escapeHtml(m.nome_completo || '')}</h3>
-                  <div style="font-size:15px;line-height:1.7;">
-                    <strong>Plano:</strong> ${escapeHtml(m.plano || '-')}<br>
-                    <strong>WhatsApp:</strong> ${escapeHtml(m.whatsapp || '-')}<br>
-                    <strong>Data de nascimento:</strong> ${escapeHtml(m.data_nascimento || '-')}<br>
-                    <strong>Endereço:</strong> ${escapeHtml(m.endereco || '-')}<br>
-                    <strong>CEP:</strong> ${escapeHtml(m.cep || '-')}<br>
-                    <strong>CPF:</strong> ${escapeHtml(m.cpf || '-')}<br>
-                    <strong>Objetivo:</strong> ${escapeHtml(m.objetivo || '-')}<br>
-                    <strong>Origem:</strong> ${escapeHtml(m.origem || '-')}<br>
-                    <strong>Data de cadastro:</strong> ${m.submitted_at ? new Date(m.submitted_at).toLocaleDateString('pt-BR') : '-'}
-                  </div>
-
-                </div>
-              `);
-            })
-            .catch(() => {
-              btn.disabled = false;
-              btn.textContent = 'Matrícula';
-              window.openModal('<div style="padding:2rem;text-align:center;">Erro ao buscar matrícula.</div>');
-            });
-        });
-      });
+      // Handler para abrir modal da matrícula (para novos cards)
+      attachMatriculaModalHandlers(userList);
     }, 220);
   }
 
@@ -119,4 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (q) debounceSearch(q);
     });
   }
+
+  // --- NOVO: ao carregar a página, atacha handlers nos cards SSR ---
+  attachMatriculaModalHandlers(userList);
 });
