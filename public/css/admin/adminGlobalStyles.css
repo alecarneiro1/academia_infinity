@@ -372,10 +372,74 @@ body{
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 24%, transparent);
 }
 
+/* Proteções e quebras para mensagens longas (URLs, strings sem espaços) */
+.chat {
+  overflow-x: hidden;      /* evita estourar a viewport */
+  box-sizing: border-box;
+}
 
+/* Bolha: não permite que conteúdo force largura fora do contêiner */
+.msg {
+  max-width: 100%;
+  box-sizing: border-box;
 
+  /* garante quebra de palavras longas sem perder quebras existentes */
+  white-space: pre-wrap;    /* preserva quebras e permite wrap */
+  overflow-wrap: anywhere;  /* força quebra quando necessário */
+  word-break: break-word;   /* compat fallback */
+}
 
+/* Texto interno: regras específicas para forçar quebra em links/strings longas */
+.msg__text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
 
+/* Links dentro das mensagens: permitir quebra dentro da URL */
+.msg__text a,
+.msg__text a * {
+  word-break: break-all;   /* quebra dentro de URLs longas */
+  overflow-wrap: anywhere;
+  white-space: normal;
+  display: inline-block;
+  max-width: 100%;
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* Imagens/iframes dentro das mensagens não devem ultrapassar a bolha */
+.msg img,
+.msg iframe,
+.msg video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Datepicker/grid proteções (evita que botões cresçam e causem overflow) */
+.date-picker,
+.date-picker__grid {
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+.dp-day {
+  min-width: 0; /* evita que o botão force a coluna a crescer */
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Garante que o conteúdo principal não crie scroll horizontal inesperado */
+.content, .card {
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
 
 /* ===== Atendimentos (1 card por linha) ===== */
 .ticket-list{
@@ -565,11 +629,13 @@ body{
   align-items: center;
   justify-content: space-between;
   padding-top: 10px;
+  padding-bottom: 10px;
 }
 .date-picker__title{
   margin: 0;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 12px;
+  text-align: center;
 }
 
 /* Semana e dias */
