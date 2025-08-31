@@ -8,8 +8,9 @@ const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho',
 
 /**
  * Constrói metadados do calendário a partir das mensagens de um contato.
+ * Agora recebe idsParam para marcar o dia selecionado (.is-selected).
  */
-function buildCalendarMeta(rows, monthParam) {
+function buildCalendarMeta(rows, monthParam, idsParam) {
   const dayToIds = new Map();   // 'YYYY-MM-DD' -> [ids]
   const monthSet = new Set();   // 'YYYY-MM'
   let latestDate = null;
@@ -33,11 +34,17 @@ function buildCalendarMeta(rows, monthParam) {
 
   const firstWeekday = new Date(y, mIdx, 1).getDay();
   const daysInMonth  = new Date(y, mIdx + 1, 0).getDate();
+
+  const idsParamNormalized = String(idsParam || '').trim();
+
   const days = [];
   for (let d = 1; d <= daysInMonth; d++) {
     const key = `${y}-${z(mIdx+1)}-${z(d)}`;
     const ids = dayToIds.get(key) || [];
-    days.push({ day:d, active: ids.length>0, ids });
+    const idsStr = ids.join(',');
+    const active = ids.length > 0;
+    const selected = active && idsParamNormalized && (idsStr === idsParamNormalized);
+    days.push({ day:d, active, ids, selected });
   }
 
   const idx     = monthsDesc.indexOf(chosen);
@@ -104,7 +111,7 @@ exports.chatlogView = async (req, res) => {
     order: [['time', 'ASC']]
   });
 
-  const dp = buildCalendarMeta(allRows, monthParam);
+  const dp = buildCalendarMeta(allRows, monthParam, idsParam);
 
   let messages = allRows;
   if (idsParam) {

@@ -387,6 +387,8 @@ body{
   white-space: pre-wrap;    /* preserva quebras e permite wrap */
   overflow-wrap: anywhere;  /* força quebra quando necessário */
   word-break: break-word;   /* compat fallback */
+  opacity: 1;
+  transition: opacity 0.32s cubic-bezier(.4,0,.2,1);
 }
 
 /* Texto interno: regras específicas para forçar quebra em links/strings longas */
@@ -664,12 +666,7 @@ justify-content:center !important;
 }
 .dp-day:is(:hover,:focus){ outline: none; background: color-mix(in oklab, var(--surface) 82%, black 18%); }
 
-/* Estados para você ligar via back-end */
-.dp-day.is-active{
-  background: var(--primary);
-  color: #fff;
-  border-color: color-mix(in oklab, var(--primary) 80%, #000 20%);
-}
+
 .dp-day.is-disabled{
   opacity: .35;
   pointer-events: none;
@@ -679,9 +676,9 @@ justify-content:center !important;
   box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 25%, transparent);
 }
 .dp-day.is-selected{
-  border-color: color-mix(in oklab, var(--primary) 85%, #000 15%);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.35), 0 0 0 4px color-mix(in oklab, var(--primary) 12%, transparent);
-  transform: translateY(-2px);
+  background: var(--primary);
+  color: #fff;
+  border-color: color-mix(in oklab, var(--primary) 80%, #000 20%);
 }
 
 
@@ -722,11 +719,6 @@ justify-content:center !important;
   transition: transform .08s ease, background .2s ease, border-color .2s ease;
 }
 .dp-day:not(.is-disabled):hover,
-.dp-day:not(.is-disabled):focus{
-
-  background: color-mix(in oklab, var(--primary) 8%, #12161f);
-  outline: none;
-}
 
 
 
@@ -760,6 +752,8 @@ justify-content:center !important;
   background: #12161f;
   display: grid;
   gap: 6px;
+  opacity: 1;
+  transition: opacity 0.32s cubic-bezier(.4,0,.2,1);
 }
 .msg__text{ margin: 0; }
 .msg__time{ justify-self: end; font-size: 11px; color: var(--muted); }
@@ -770,6 +764,31 @@ justify-content:center !important;
   justify-self: end;
   background: color-mix(in oklab, var(--primary) 12%, #12161f);
   border-color: color-mix(in oklab, var(--primary) 60%, #000 40%);
+}
+
+/* Fade-in/out para bolhas de mensagem */
+.msg {
+  opacity: 1;
+  transition: opacity 0.32s cubic-bezier(.4,0,.2,1);
+}
+
+/* Utilitários para fade */
+.msg.fade-in {
+  opacity: 0;
+  animation: msg-fadein 0.38s cubic-bezier(.4,0,.2,1) forwards;
+}
+.msg.fade-out {
+  opacity: 1;
+  animation: msg-fadeout 0.28s cubic-bezier(.4,0,.2,1) forwards;
+}
+
+@keyframes msg-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes msg-fadeout {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
 
 

@@ -47,7 +47,7 @@
           </div>
 
           <div class="date-head-actions">
-            <a class="btn btn--primary-soft" href="/admin/chatlogs/<%= userId %>">Todas mensagens</a>
+            <a class="btn btn--primary-soft" href="/admin/chatlogs/<%= userId %>">Todas</a>
           </div>
         </div>
 
@@ -63,7 +63,8 @@
           <% for (let d = 1; d <= dp.daysInMonth; d++) { 
                const info = dp.days[d-1]; %>
             <% if (info && info.active) { %>
-              <a class="dp-day is-active" href="/admin/chatlogs/<%= userId %>/<%= info.ids.join(',') %>"><%= d %></a>
+              <a class="dp-day is-active <%= info.selected ? 'is-selected' : '' %>"
+                 href="/admin/chatlogs/<%= userId %>/<%= info.ids.join(',') %>"><%= d %></a>
             <% } else { %>
               <button class="dp-day is-disabled" type="button" disabled><%= d %></button>
             <% } %>

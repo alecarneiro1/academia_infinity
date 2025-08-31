@@ -29,8 +29,26 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      // troca mensagens
-      curMsgs ? curMsgs.replaceWith(newMsgs) : form.after(newMsgs);
+      // --- FADE OUT das mensagens antigas ---
+      if (curMsgs) {
+        curMsgs.querySelectorAll('.msg').forEach(el => {
+          el.classList.add('fade-out');
+        });
+      }
+
+      // troca mensagens com fade-in nas novas
+      setTimeout(() => {
+        if (curMsgs) {
+          curMsgs.replaceWith(newMsgs);
+        } else {
+          form.after(newMsgs);
+        }
+        // FADE IN nas novas bolhas
+        newMsgs.querySelectorAll('.msg').forEach(el => {
+          el.classList.add('fade-in');
+          setTimeout(() => el.classList.remove('fade-in'), 400);
+        });
+      }, curMsgs ? 220 : 0); // espera fade-out antes de trocar
 
       // troca datepicker (pode existir ou não)
       if (curDP) curDP.remove();
@@ -41,6 +59,12 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       if (opts.push) history.pushState(null, '', url);
+
+      // sincroniza seleção no novo datepicker (se houver ids na url)
+      try {
+        const idsNow = extractIdsFromUrl(url);
+        setSelectedDayInDatepicker(idsNow);
+      } catch (err) { /* silent */ }
 
       // volta exata posição anterior
       window.scrollTo({ top: keepY });
@@ -66,6 +90,15 @@ document.addEventListener('DOMContentLoaded', function () {
       // só intercepta nossas rotas
       if (href.startsWith('/admin/chatlogs')) {
         e.preventDefault();
+
+        // marca seleção visual imediatamente no elemento clicado (se for dp-day)
+        try {
+          const grid = document.querySelector('.date-picker__grid');
+          if (grid) grid.querySelectorAll('.dp-day.is-selected').forEach(el => el.classList.remove('is-selected'));
+          if (a.classList.contains('dp-day')) a.classList.add('is-selected');
+        } catch (err) { /* silent */ }
+
+        // navega via AJAX (soft)
         softNavigate(href);
       }
     });
@@ -192,3 +225,61 @@ function buildCalendarMeta(rows, monthParam, idsParam) {
     hasNext, nextMonth
   };
 }
+
+// --- NOVOS HELPERS: extrair ids da URL e marcar o dia selecionado ---
+function extractIdsFromUrl(url) {
+  if (!url) return '';
+  try {
+    // remove query/hash
+    const clean = url.split(/[?#]/)[0];
+    const parts = clean.split('/').filter(Boolean); // ["admin","chatlogs",":userid", "ids"]
+    const idx = parts.indexOf('chatlogs');
+    if (idx === -1) return '';
+    // ids podem estar em parts[idx+2]
+    return parts[idx + 2] || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function setSelectedDayInDatepicker(idsParam) {
+  const grid = document.querySelector('.date-picker__grid');
+  if (!grid) return;
+  // remove seleção atual
+  grid.querySelectorAll('.dp-day.is-selected').forEach(el => el.classList.remove('is-selected'));
+  if (!idsParam) return;
+  // procura um elemento ativo cujo href contenha os ids exatos (ou a substring)
+  const items = grid.querySelectorAll('.dp-day');
+  for (const el of items) {
+    if (el.tagName.toLowerCase() === 'a') {
+      const href = el.getAttribute('href') || '';
+      // comparador simples: verificar que a URL contenha "/<idsParam>" (mais robusto que contains simples)
+      if (href.includes(`/${idsParam}`) || href.endsWith(idsParam) || href.indexOf(encodeURIComponent(idsParam)) !== -1) {
+        el.classList.add('is-selected');
+        return;
+      }
+    } else {
+      // elemento pode ser <button> (disabled) — ignora
+    }
+  }
+}
+
+// sincroniza seleção após softNavigate (chamada interna em softNavigate quando substitui datepicker)
+// Para isso, patchamos softNavigate: após inserir newDP, notificar seleção.
+// (como softNavigate já substitui os elementos acima, chamaremos setSelectedDayInDatepicker a partir daí)
+// Atualiza softNavigate: (local dentro do arquivo) -> após history.pushState(...); adicione:
+//    setSelectedDayInDatepicker(extractIdsFromUrl(url));
+// Como estamos mostrando apenas alterações, abaixo está a localização e a chamada a ser adicionada.
+// ...existing code...
+
+// (local onde softNavigate faz history.pushState(null, '', url);) adicione a chamada:
+// after replacing DP and pushing state:
+// setSelectedDayInDatepicker(extractIdsFromUrl(url));
+
+// Finalmente, ao carregar a página inicialmente, sincroniza seleção com a URL atual (caso SSR não tenha marcado)
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    const currentIds = extractIdsFromUrl(location.pathname + location.search);
+    setSelectedDayInDatepicker(currentIds);
+  } catch (e) { /* silent */ }
+});
