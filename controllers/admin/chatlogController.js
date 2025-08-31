@@ -6,15 +6,10 @@ const z = n => String(n).padStart(2, '0');
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho',
                'Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
-/**
- * Constrói metadados do calendário a partir das mensagens de um contato.
- * Agora recebe idsParam para marcar o dia selecionado (.is-selected).
- */
+/** Monta metadados do calendário a partir das mensagens de um contato. */
 function buildCalendarMeta(rows, monthParam, idsParam) {
   const dayToIds = new Map();   // 'YYYY-MM-DD' -> [ids]
   const monthSet = new Set();   // 'YYYY-MM'
-  let latestDate = null;
-
   rows.forEach(r => {
     const d = new Date(r.time);
     const keyDay   = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`;
@@ -22,7 +17,6 @@ function buildCalendarMeta(rows, monthParam, idsParam) {
     if (!dayToIds.has(keyDay)) dayToIds.set(keyDay, []);
     dayToIds.get(keyDay).push(r.id);
     monthSet.add(keyMonth);
-    if (!latestDate || d > latestDate) latestDate = d;
   });
 
   const monthsDesc = Array.from(monthSet).sort().reverse();
@@ -67,6 +61,15 @@ function buildCalendarMeta(rows, monthParam, idsParam) {
   };
 }
 
+// --------- Página (shell) ----------
+exports.renderPage = async (req, res) => {
+  // A página carrega “vazia”; o JS lê ?user&ids&month e faz AJAX
+  res.render('admin/chatlogView', {
+    activePath: '/admin/chatlogs'
+  });
+};
+
+// --------- Autocomplete ----------
 exports.searchContacts = async (req, res) => {
   const q = req.query.q || '';
   if (!q) return res.json([]);
@@ -82,49 +85,69 @@ exports.searchContacts = async (req, res) => {
   }));
 };
 
-/**
- * View principal (SSR, dirigida por URL)
- * /admin/chatlogs
- * /admin/chatlogs/:userid
- * /admin/chatlogs/:userid/:ids
- * Aceita ?month=YYYY-MM p/ mover o calendário.
- */
-exports.chatlogView = async (req, res) => {
-  const userId    = req.params.userid ? Number(req.params.userid) : null;
-  const idsParam  = req.params.ids || '';
-  const monthParam = req.query.month;
+// --------- API: Calendar (JSON) ----------
+exports.apiCalendar = async (req, res) => {
+  try {
+    const userId    = Number(req.query.user || 0);
+    const month     = req.query.month || '';
+    const idsParam  = req.query.ids || '';
 
-  if (!userId) {
-    return res.render('admin/chatlogView', {
-      activePath: '/admin/chatlogs',
-      contact: null,
-      messages: [],
-      userId: null,
-      idsParam: '',
-      dp: { hasData:false }
+    if (!userId) return res.json({ ok:true, dp:{ hasData:false }, contact:null });
+
+    const contact = await Contact.findByPk(userId);
+    const allRows = await Chatlog.findAll({
+      where: { contactid: userId },
+      attributes: ['id','time'],
+      order: [['time','ASC']]
     });
+
+    const dp = buildCalendarMeta(allRows, month, idsParam);
+    return res.json({
+      ok: true,
+      contact: contact ? { id: contact.id, name: contact.contactname } : null,
+      dp
+    });
+  } catch (err) {
+    console.error('apiCalendar', err);
+    res.status(500).json({ ok:false, error:'calendar_failed' });
   }
+};
 
-  const contact = await Contact.findByPk(userId);
-  const allRows = await Chatlog.findAll({
-    where: { contactid: userId },
-    order: [['time', 'ASC']]
-  });
+// --------- API: Messages (JSON) ----------
+exports.apiMessages = async (req, res) => {
+  try {
+    const userId   = Number(req.query.user || 0);
+    const idsParam = (req.query.ids || '').trim();
 
-  const dp = buildCalendarMeta(allRows, monthParam, idsParam);
+    if (!userId) return res.json({ ok:true, items:[], contact:null });
 
-  let messages = allRows;
-  if (idsParam) {
-    const idList = idsParam.split(',').map(Number).filter(Boolean);
-    messages = allRows.filter(m => idList.includes(m.id));
+    const contact = await Contact.findByPk(userId);
+
+    let where = { contactid: userId };
+    if (idsParam) {
+      const idList = idsParam.split(',').map(Number).filter(Boolean);
+      where.id = { [Op.in]: idList };
+    }
+
+    const rows = await Chatlog.findAll({
+      where,
+      order: [['time','ASC']]
+    });
+
+    const items = rows.map(r => ({
+      id: r.id,
+      usermessage: r.usermessage,
+      agentresponse: r.agentresponse,
+      time: r.time
+    }));
+
+    return res.json({
+      ok: true,
+      contact: contact ? { id: contact.id, name: contact.contactname } : null,
+      items
+    });
+  } catch (err) {
+    console.error('apiMessages', err);
+    res.status(500).json({ ok:false, error:'messages_failed' });
   }
-
-  return res.render('admin/chatlogView', {
-    activePath: '/admin/chatlogs',
-    contact,
-    messages,
-    userId,
-    idsParam,
-    dp
-  });
 };

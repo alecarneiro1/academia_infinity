@@ -1,94 +1,133 @@
-const Summary = require('../../models/summaryModel');
-const Contact = require('../../models/contactModel');
+const Summary   = require('../../models/summaryModel');
+const Contact   = require('../../models/contactModel');
 const Matricula = require('../../models/matriculaModel');
-const { Op } = require('sequelize');
+const { Op }    = require('sequelize');
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 10; // se quiser paginação
 
-exports.listAtendimentos = async (req, res) => {
+const z = n => String(n).padStart(2, '0');
+
+function toDigits55(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  return digits.startsWith('55') ? digits : (digits ? `55${digits}` : '');
+}
+
+// ---------- Página (shell) ----------
+exports.renderPage = async (req, res) => {
+  res.render('admin/atendimentosView', {
+    activePath: '/admin/atendimentos'
+  });
+};
+
+// ---------- Autocomplete (contatos) ----------
+exports.searchContacts = async (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) return res.json([]);
+  const contacts = await Contact.findAll({
+    where: { contactname: { [Op.iLike]: `${q}%` } },
+    order: [['contactname', 'ASC']],
+    limit: 5
+  });
+  res.json(contacts.map(c => ({
+    id: c.id,
+    name: c.contactname,
+    phone: c.contactphone || '',
+    phoneDigits: toDigits55(c.contactphone)
+  })));
+};
+
+// ---------- Lista de atendimentos (JSON) ----------
+exports.apiList = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const idsParam = req.params.ids;
-    let where = {};
-    let contactInfo = null;
+    const userId   = Number(req.query.user || 0);
+    const idsParam = (req.query.ids || '').trim();
+    const page     = Math.max(1, parseInt(req.query.page || '1', 10));
 
+    const where = {};
+    if (userId) where.contact = userId;
     if (idsParam) {
-      // idsParam pode ser id do contato OU lista de ids de atendimento
-      const userId = Number(idsParam);
-      if (!isNaN(userId)) {
-        where.contact = userId;
-        // Busca info do contato para mostrar contexto
-        contactInfo = await Contact.findByPk(userId);
-      } else {
-        // fallback: lista de atendimentos por id
-        const ids = idsParam.split(',').map(Number).filter(Boolean);
-        where.id = { [Op.in]: ids };
-      }
+      const ids = idsParam.split(',').map(Number).filter(Boolean);
+      if (ids.length) where.id = { [Op.in]: ids };
     }
 
+    // consulta
     const { count, rows } = await Summary.findAndCountAll({
       where,
       order: [['id', 'DESC']],
       offset: (page - 1) * PAGE_SIZE,
-      limit: PAGE_SIZE,
+      limit: PAGE_SIZE
     });
 
-    // Busca contatos e matrículas relacionados
-    const contactIds = rows.map(r => r.contact).filter(Boolean);
-    const contacts = await Contact.findAll({
-      where: { id: { [Op.in]: contactIds } },
-      attributes: ['id', 'contactname', 'contactphone'],
-    });
-    const contactMap = {};
-    contacts.forEach(c => { contactMap[c.id] = c; });
+    // contatos e matrículas relacionados
+    const contactIds = Array.from(new Set(rows.map(r => r.contact).filter(Boolean)));
+    const contacts = contactIds.length
+      ? await Contact.findAll({
+          where: { id: { [Op.in]: contactIds } },
+          attributes: ['id', 'contactname', 'contactphone']
+        })
+      : [];
+    const cMap = {};
+    contacts.forEach(c => { cMap[c.id] = c; });
 
-    // Busca matrículas relacionadas
-    const matriculas = await Matricula.findAll({
-      where: { contact: { [Op.in]: contactIds } },
-      attributes: ['id', 'contact'],
-    });
-    const matriculaMap = {};
-    matriculas.forEach(m => { matriculaMap[m.contact] = m.id; });
+    const matriculas = contactIds.length
+      ? await Matricula.findAll({
+          where: { contact: { [Op.in]: contactIds } },
+          attributes: ['id', 'contact']
+        })
+      : [];
+    const mMap = {};
+    matriculas.forEach(m => { mMap[m.contact] = m.id; });
 
-    // Monta dados para view
-    const atendimentos = rows.map(a => {
+    // mapeia cards
+    const itens = rows.map(a => {
       let chatIds = [];
       if (Array.isArray(a.chatid)) {
         chatIds = a.chatid.map(id => String(id).replace(/[{}]/g, ''));
       } else if (typeof a.chatid === 'string') {
         chatIds = a.chatid.replace(/[{}]/g, '').split(',').map(s => s.trim()).filter(Boolean);
       }
+      const c = cMap[a.contact];
+      const contato_phoneDigits = toDigits55(c?.contactphone);
+
       return {
         id: a.id,
         subject: a.subject,
-        contato: contactMap[a.contact]?.contactname || '-',
-        contato_phone: contactMap[a.contact]?.contactphone || '',
+        contatoId: a.contact || null,
+        contato: c?.contactname || '-',
+        contato_phone: c?.contactphone || '',
+        contato_phoneDigits,
         date: a.date,
         start_time: a.start_time,
         end_time: a.end_time,
         duration_minutes: a.duration_minutes,
         summary: a.summary,
-        matriculaId: matriculaMap[a.contact] || null,
+        matriculaId: mMap[a.contact] || null,
         chatlogLink: (a.contact && chatIds.length)
-          ? `/admin/chatlogs/${a.contact}/${chatIds.join(',')}`
+          ? `/admin/chatlogs?user=${a.contact}&ids=${encodeURIComponent(chatIds.join(','))}`
           : null
       };
     });
 
-    // Se for AJAX (API), retorna JSON
-    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-      return res.json({ atendimentos, hasMore: (page * PAGE_SIZE) < count });
+    // header “Mostrando atendimentos para …”
+    let contactInfo = null;
+    if (userId && cMap[userId]) {
+      contactInfo = {
+        id: userId,
+        contactname: cMap[userId].contactname,
+        contactphone: cMap[userId].contactphone || '',
+        contactphoneDigits: toDigits55(cMap[userId].contactphone)
+      };
     }
 
-    res.render('admin/atendimentosView', {
-      atendimentos,
-      hasMore: (page * PAGE_SIZE) < count,
-      idsParam: idsParam || '',
+    return res.json({
+      ok: true,
+      items: itens,
       contactInfo,
-      activePath: '/admin/atendimentos'
+      page,
+      hasMore: (page * PAGE_SIZE) < count
     });
   } catch (err) {
-    console.error('Erro ao buscar atendimentos:', err);
-    res.status(500).send('Erro ao buscar atendimentos');
+    console.error('apiList atendimentos', err);
+    res.status(500).json({ ok:false, error:'list_failed' });
   }
 };
