@@ -394,7 +394,6 @@ body{
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
-  hyphens: auto;
   max-width: 100%;
 }
 
@@ -626,8 +625,7 @@ body{
 }
 .date-picker__head{
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+justify-content:center !important;
   padding-top: 10px;
   padding-bottom: 10px;
 }

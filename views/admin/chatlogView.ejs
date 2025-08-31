@@ -37,9 +37,7 @@
           <h4 class="date-picker__title" id="month-title" aria-live="polite"></h4>
           <button class="date-btn" type="button" id="next-month" aria-label="Próximo mês">›</button>
         </div>
-        <div class="date-head-actions">
-          <button class="btn btn--primary-soft" type="button" id="btn-all-messages" style="display:none;">Todas mensagens</button>
-        </div>
+        <!-- removed "Todas mensagens" button -->
       </div>
 
       <div class="date-picker__weekdays" id="weekdays" aria-hidden="true">
@@ -55,10 +53,13 @@
   <!-- Conversa (SSR) -->
   <section class="chat" aria-live="polite" id="chat-messages">
     <% if (messages && messages.length) { %>
-      <% if (!idsParam) { %>
-        <div class="chat__day">Todas as mensagens de <b><%= contact ? contact.contactname : '' %></b></div>
-      <% } %>
-      <% messages.forEach(function(m){ %>
+      <% var lastDay = null; %>
+      <% messages.forEach(function(m){ 
+           var day = new Date(m.time).toLocaleDateString('pt-BR');
+           if (day !== lastDay) { %>
+             <div class="chat__day"><%= day %></div>
+           <% lastDay = day; } %>
+
         <% if (m.usermessage) { %>
           <div class="msg msg--in">
             <p class="msg__text"><%= m.usermessage %></p>
@@ -71,11 +72,14 @@
             <span class="msg__time"><%= new Date(m.time).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) %></span>
           </div>
         <% } %>
+
       <% }) %>
+    <% } else { %>
+      <div style="text-align:center;color:var(--muted);padding:2rem;">Nenhuma mensagem encontrada.</div>
     <% } %>
   </section>
 
-  <div style="text-align:center; margin:2.5rem 0 0;">
+  <div style="text-align:center; margin:0 0 3.5rem;">
     <button class="btn btn--ghost" onclick="window.scrollTo({top:0,behavior:'smooth'})">Voltar pro topo</button>
   </div>
 </article>
@@ -92,3 +96,4 @@
 <script src="/js/admin/adminGlobalScripts.js"></script>
 </body>
 </html>
+

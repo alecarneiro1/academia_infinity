@@ -54,8 +54,8 @@ exports.chatlogView = async (req, res) => {
     return res.json({ days, allIds, year, month, monthLabel });
   }
 
-  // 2) JSON de mensagens por ids (AJAX)
-  if (req.query.json == '1' && idsParam) {
+  // 2) JSON de mensagens por ids (AJAX) - somente quando idsParam representa ids numéricos
+  if (req.query.json == '1' && idsParam && idsParam !== 'all') {
     const ids = idsParam.split(',').map(Number).filter(Boolean);
     const rows = await Chatlog.findAll({
       where: { id: { [Op.in]: ids }, contactid: userId },
@@ -68,10 +68,17 @@ exports.chatlogView = async (req, res) => {
   const contact = await Contact.findByPk(userId);
   const where = { contactid: userId };
 
-  if (idsParam) {
+  // Se idsParam existe e NÃO é 'all', filtra apenas por esses ids.
+  if (idsParam && idsParam !== 'all') {
     const ids = idsParam.split(',').map(Number).filter(Boolean);
-    where.id = { [Op.in]: ids };
+    if (ids.length) {
+      where.id = { [Op.in]: ids };
+    } else {
+      // idsParam estava presente mas não havia ids numéricos -> torna where impossível
+      where.id = { [Op.in]: [] };
+    }
   }
+  // Se idsParam === 'all' => NÃO definimos where.id (busca todas as mensagens do contato)
 
   const messages = await Chatlog.findAll({
     where,

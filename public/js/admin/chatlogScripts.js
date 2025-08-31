@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const monthTitle = document.getElementById('month-title');
   const pickerContext = document.getElementById('picker-context');
   const selectedContactName = document.getElementById('selected-contact-name');
-  const btnAllMessages = document.getElementById('btn-all-messages');
   const chatMessages = document.getElementById('chat-messages');
   const prevBtn = document.getElementById('prev-month');
   const nextBtn = document.getElementById('next-month');
@@ -73,8 +72,49 @@ document.addEventListener('DOMContentLoaded', function () {
     selectedContact = item;
     searchInput.value = `${item.name} (${item.phoneDigits || item.phone || ''})`;
     autocompleteList.style.display = 'none';
-    loadContactDays(item.id);
-    history.replaceState({}, '', `/admin/chatlogs/${item.id}`);
+    selectedContactName.textContent = item.name;
+
+    // Carrega metadados e depois seleciona automaticamente o dia mais recente e carrega mensagens
+    loadContactDays(item.id)
+      .then(() => {
+        // procura última data disponível (keys em formato YYYY-MM-DD ordenam lexicograficamente)
+        const dates = Object.keys(daysByDate || {});
+        if (!dates.length) {
+          chatMessages.innerHTML = '<div style="text-align:center;color:var(--muted);padding:2rem;">Nenhuma mensagem disponível.</div>';
+          history.replaceState({}, '', `/admin/chatlogs/${item.id}`);
+          return;
+        }
+        const latest = dates.sort().pop(); // data mais recente
+        const ids = daysByDate[latest];
+        if (!Array.isArray(ids) || !ids.length) {
+          chatMessages.innerHTML = '<div style="text-align:center;color:var(--muted);padding:2rem;">Nenhuma mensagem disponível.</div>';
+          history.replaceState({}, '', `/admin/chatlogs/${item.id}`);
+          return;
+        }
+
+        // se o mês do dia não estiver visível, ajusta o mês
+        const [y, mm, dd] = latest.split('-');
+        const monthNum = Number(mm) - 1;
+        const monthIdx = monthsAvailable.findIndex(m => m.year === Number(y) && m.month === monthNum);
+        if (monthIdx >= 0) {
+          currentMonthIndex = monthIdx;
+          renderMonth(currentMonthIndex);
+        }
+
+        // marca visualmente o dia e carrega mensagens
+        setTimeout(() => {
+          datepickerGrid.querySelectorAll('.dp-day.is-selected').forEach(x => x.classList.remove('is-selected'));
+          const btn = Array.from(datepickerGrid.querySelectorAll('.dp-day')).find(b => b.textContent.trim() === String(Number(dd)));
+          if (btn) btn.classList.add('is-selected');
+          // carrega mensagens desse dia
+          loadMessagesByIds(item.id, ids, item.name, false, latest);
+          history.replaceState({}, '', `/admin/chatlogs/${item.id}/${ids.join(',')}`);
+        }, 20);
+      })
+      .catch(err => {
+        console.error('Erro ao carregar dias do contato:', err);
+        history.replaceState({}, '', `/admin/chatlogs/${item.id}`);
+      });
   }
 
   // --- Helpers ---
@@ -100,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // --- Load days metadata for contact ---
   function loadContactDays(contactId) {
-    fetch(`/admin/chatlogs/${contactId}?meta=days`)
+    return fetch(`/admin/chatlogs/${contactId}?meta=days`)
       .then(res => res.json())
       .then(data => {
         // data.days: [{date, ids}], data.allIds, data.year, data.month, data.monthLabel
@@ -122,14 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => datepickerWrap.style.opacity = 1, 16);
         pickerContext.style.display = 'block';
         selectedContactName.textContent = selectedContact.name;
-        btnAllMessages.style.display = allMessagesIds.length ? 'inline-block' : 'none';
-        btnAllMessages.onclick = () => {
-          if (!allMessagesIds.length) return;
-          // remove seleção visual ao pedir "Todas"
-          datepickerGrid.querySelectorAll('.dp-day.is-selected').forEach(x => x.classList.remove('is-selected'));
-          loadMessagesByIds(selectedContact.id, allMessagesIds, selectedContact.name, true);
-          history.replaceState({}, '', `/admin/chatlogs/${selectedContact.id}/all`);
-        };
+        // (removed "Todas mensagens" button UI and handlers)
 
         // --- APLICAR SELEÇÃO INICIAL (se a URL veio com ids) ---
         try {
@@ -173,6 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .catch(err => {
         console.error('Erro ao buscar dias:', err);
+        throw err;
       });
   }
 
@@ -264,9 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function renderMessages(messages, contactName, all, dayStr) {
     let html = '';
-    if (all) {
-      html += `<div class="chat__day">Todas as mensagens de <b>${escapeHtml(contactName)}</b></div>`;
-    } else if (dayStr) {
+    if (dayStr) {
       const [y, m, d] = dayStr.split('-');
       html += `<div class="chat__day">${d}/${m}/${y}</div>`;
     }
