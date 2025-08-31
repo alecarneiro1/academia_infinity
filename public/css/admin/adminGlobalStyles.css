@@ -654,7 +654,7 @@ body{
 }
 .dp-day:not(.is-disabled):hover,
 .dp-day:not(.is-disabled):focus{
-  transform: scale(1.02);
+
   background: color-mix(in oklab, var(--primary) 8%, #12161f);
   outline: none;
 }

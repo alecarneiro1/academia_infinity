@@ -1,10 +1,6 @@
 <%- include('./partials/headPartialView') %>
 <%- include('./partials/headerPartialView') %>
 
-  
-
-
-
 <main class="content">
 <article class="card block" id="mensagens">
   <header class="block__head">
@@ -14,131 +10,64 @@
     </div>
   </header>
 
-
-<!-- MENSSAGENS: filtro + datepicker no MESMO box -->
-<form class="searchbox msg-filter" role="search" onsubmit="return false">
-  <!-- (opcional) linha com input, deixe se for usar busca por texto -->
-  <div class="search-row">
-    <div class="search-field">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill="currentColor"
-          d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
-      </svg>
-      <input class="search-input" type="search"
-             placeholder="Pesquisar por nome..."
-             aria-label="Pesquisar mensagens" />
-    </div>
-    <button class="btn btn--primary-soft" type="submit">Buscar</button>
-  </div>
-
-  <!-- Datepicker -->
-  <div class="date-picker">
-    <div class="date-picker__head">
-      <div class="date-nav">
-        <button class="date-btn" type="button" aria-label="Mês anterior">‹</button>
-        <h4 class="date-picker__title" aria-live="polite">Agosto 2025</h4>
-        <button class="date-btn" type="button" aria-label="Próximo mês">›</button>
+  <!-- Busca de contato -->
+  <form class="searchbox msg-filter" role="search" onsubmit="return false" autocomplete="off">
+    <div class="search-row">
+      <div class="search-field" style="position:relative;">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor"
+            d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
+        </svg>
+        <input class="search-input" id="contact-search" type="search"
+               placeholder="Pesquisar por nome..."
+               aria-label="Pesquisar mensagens" autocomplete="off" />
+        <ul id="autocomplete-list" style="position:absolute;left:0;right:0;top:110%;z-index:10;background:var(--surface,#171a21);border-radius:10px;box-shadow:0 4px 16px #0002;list-style:none;margin:0;padding:0;display:none;"></ul>
       </div>
-      <div class="date-head-actions">
-        <button class="btn btn--primary-soft" type="button">Todas mensagens</button>
+      <button class="btn btn--primary-soft" type="submit" tabindex="-1" style="display:none;">Buscar</button>
+    </div>
+
+    <!-- Datepicker (escondido até selecionar contato) -->
+    <div class="date-picker" id="datepicker-wrap" style="display:none;opacity:0;transition:opacity .28s;">
+      <div class="date-picker__head" style="align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="date-btn" type="button" id="prev-month" aria-label="Mês anterior">‹</button>
+          <h4 class="date-picker__title" id="month-title" aria-live="polite"></h4>
+          <button class="date-btn" type="button" id="next-month" aria-label="Próximo mês">›</button>
+        </div>
+        <div class="date-head-actions">
+          <button class="btn btn--primary-soft" type="button" id="btn-all-messages" style="display:none;">Todas mensagens</button>
+        </div>
       </div>
+
+      <div class="date-picker__weekdays" id="weekdays" aria-hidden="true">
+        <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+      </div>
+
+      <div class="date-picker__grid" id="datepicker-grid" role="grid" aria-label="Selecione uma data"></div>
+
+      <p class="picker-context" id="picker-context" style="display:none;margin-top:8px;">Exibindo conversa com: <strong id="selected-contact-name"></strong></p>
     </div>
-
-    <div class="date-picker__weekdays">
-      <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
-    </div>
-
-    <!-- Marque .is-active nos dias com mensagens; .is-disabled no resto -->
-    <div class="date-picker__grid" role="grid" aria-label="Selecione uma data">
-      <button class="dp-day is-active" type="button">1</button>
-      <button class="dp-day is-disabled" type="button" disabled>2</button>
-      <button class="dp-day is-disabled" type="button" disabled>3</button>
-      <button class="dp-day is-disabled" type="button" disabled>4</button>
-      <button class="dp-day is-disabled" type="button" disabled>5</button>
-      <button class="dp-day is-disabled" type="button" disabled>6</button>
-      <button class="dp-day is-disabled" type="button" disabled>7</button>
-
-      <button class="dp-day is-disabled" type="button" disabled>8</button>
-      <button class="dp-day is-disabled" type="button" disabled>9</button>
-      <button class="dp-day is-disabled" type="button" disabled>10</button>
-      <button class="dp-day is-disabled" type="button" disabled>11</button>
-      <button class="dp-day is-disabled" type="button" disabled>12</button>
-      <button class="dp-day is-disabled" type="button" disabled>13</button>
-      <button class="dp-day is-disabled" type="button" disabled>14</button>
-
-      <button class="dp-day is-disabled" type="button" disabled>15</button>
-      <button class="dp-day is-disabled" type="button" disabled>16</button>
-      <button class="dp-day is-disabled" type="button" disabled>17</button>
-      <button class="dp-day is-disabled" type="button" disabled>18</button>
-      <button class="dp-day is-disabled" type="button" disabled>19</button>
-      <button class="dp-day is-disabled" type="button" disabled>20</button>
-      <button class="dp-day is-disabled" type="button" disabled>21</button>
-
-      <button class="dp-day is-disabled" type="button" disabled>22</button>
-      <button class="dp-day is-active" type="button">23</button>
-      <button class="dp-day is-disabled" type="button" disabled>24</button>
-      <button class="dp-day is-disabled" type="button" disabled>25</button>
-      <button class="dp-day is-disabled" type="button" disabled>26</button>
-      <button class="dp-day is-disabled" type="button" disabled>27</button>
-      <button class="dp-day is-disabled" type="button" disabled>28</button>
-
-      <button class="dp-day is-disabled" type="button" disabled>29</button>
-      <button class="dp-day is-active is-today" type="button" aria-pressed="true">30</button>
-      <button class="dp-day is-disabled" type="button" disabled>31</button>
-    </div>
-
-    <p class="picker-context">Exibindo conversa com: <strong>Alexandre Carneiro</strong></p>
-  </div>
-</form>
-
+  </form>
 
   <!-- Conversa -->
-  <section class="chat" aria-live="polite">
-    <div class="chat__day">30/08/2025</div>
-
-    <div class="msg msg--in">
-      <p class="msg__text">Oi! Consegue me passar os planos e horários da academia?</p>
-      <span class="msg__time">09:12</span>
-    </div>
-
-    <div class="msg msg--out">
-      <p class="msg__text">Claro! Temos os planos Mensal, Trimestral e Anual. Quer receber um PDF com os valores e benefícios?</p>
-      <span class="msg__time">09:13</span>
-    </div>
-
-    <div class="msg msg--in">
-      <p class="msg__text">Quero sim. E vocês têm promoções para matrícula hoje?</p>
-      <span class="msg__time">09:15</span>
-    </div>
-
-    <div class="msg msg--out">
-      <p class="msg__text">Hoje temos 50% na taxa de matrícula para pagamentos no cartão ou Pix. 💳✨</p>
-      <span class="msg__time">09:16</span>
-    </div>
-
-    <div class="msg msg--in">
-      <p class="msg__text">Perfeito! Manda o link do Instagram e fotos do espaço, por favor.</p>
-      <span class="msg__time">09:18</span>
-    </div>
+  <section class="chat" aria-live="polite" id="chat-messages">
+    <!-- Mensagens renderizadas via JS -->
   </section>
+
+  <div style="text-align:center; margin:2.5rem 0 0;">
+    <button class="btn btn--ghost" onclick="window.scrollTo({top:0,behavior:'smooth'})">Voltar pro topo</button>
+  </div>
 </article>
-</main>"
+</main>
 
-  
-  
-  
-  
-  <!-- Botão hambúrguer (mobile) -->
-  <label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
-    <span></span><span></span><span></span>
-  </label>
+<!-- Botão hambúrguer (mobile) -->
+<label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
+  <span></span><span></span><span></span>
+</label>
+<!-- Overlay para fechar o menu quando aberto no mobile -->
+<label for="nav-toggle" class="overlay" aria-hidden="true"></label>
 
-  <!-- Overlay para fechar o menu quando aberto no mobile -->
-  <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
-
-  <!-- Scripts -->
-   <script src="chatlogView.ejs"></script>
-  <script src="adminGlobalScripts.js"></script>
-
+<script src="/js/admin/chatlogScripts.js"></script>
+<script src="/js/admin/adminGlobalScripts.js"></script>
 </body>
 </html>
