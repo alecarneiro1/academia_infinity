@@ -108,7 +108,8 @@ document.addEventListener('DOMContentLoaded', function () {
           if (btn) btn.classList.add('is-selected');
           // carrega mensagens desse dia
           loadMessagesByIds(item.id, ids, item.name, false, latest);
-          history.replaceState({}, '', `/admin/chatlogs/${item.id}/${ids.join(',')}`);
+          // Atualiza URL apenas com o id do usuário (sem ids da data)
+          history.replaceState({}, '', `/admin/chatlogs/${item.id}`);
         }, 20);
       })
       .catch(err => {
