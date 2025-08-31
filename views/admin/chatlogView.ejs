@@ -2,10 +2,7 @@
 <%- include('./partials/headerPartialView') %>
 
 <main class="content">
-<article class="card block" id="mensagens"
-  data-user-id="<%= userId %>"
-  data-contact-name="<%= contact ? contact.contactname : '' %>"
-  data-ids-param="<%= idsParam || '' %>">
+<article class="card block" id="mensagens">
   <header class="block__head">
     <div>
       <h3 class="block__title">Mensagens</h3>
@@ -29,25 +26,53 @@
       <button class="btn btn--primary-soft" type="submit" tabindex="-1" style="display:none;">Buscar</button>
     </div>
 
-    <!-- Datepicker (escondido até selecionar contato) -->
-    <div class="date-picker" id="datepicker-wrap" style="display:none;opacity:0;transition:opacity .28s;">
-      <div class="date-picker__head" style="align-items:center;">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <button class="date-btn" type="button" id="prev-month" aria-label="Mês anterior">‹</button>
-          <h4 class="date-picker__title" id="month-title" aria-live="polite"></h4>
-          <button class="date-btn" type="button" id="next-month" aria-label="Próximo mês">›</button>
+    <% if (contact && dp && dp.hasData) { %>
+      <!-- Datepicker SSR (links reais) -->
+      <div class="date-picker" id="datepicker-wrap" style="opacity:1;">
+        <div class="date-picker__head" style="align-items:center;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <% if (dp.hasPrev) { %>
+              <a class="date-btn" href="/admin/chatlogs/<%= userId %>?month=<%= dp.prevMonth %>" aria-label="Mês anterior">‹</a>
+            <% } else { %>
+              <button class="date-btn" type="button" disabled aria-disabled="true">‹</button>
+            <% } %>
+
+            <h4 class="date-picker__title" id="month-title" aria-live="polite"><%= dp.label %></h4>
+
+            <% if (dp.hasNext) { %>
+              <a class="date-btn" href="/admin/chatlogs/<%= userId %>?month=<%= dp.nextMonth %>" aria-label="Próximo mês">›</a>
+            <% } else { %>
+              <button class="date-btn" type="button" disabled aria-disabled="true">›</button>
+            <% } %>
+          </div>
+
+          <div class="date-head-actions">
+            <a class="btn btn--primary-soft" href="/admin/chatlogs/<%= userId %>">Todas mensagens</a>
+          </div>
         </div>
-        <!-- removed "Todas mensagens" button -->
+
+        <div class="date-picker__weekdays" aria-hidden="true">
+          <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+        </div>
+
+        <div class="date-picker__grid" role="grid" aria-label="Selecione uma data">
+          <% for (let i = 0; i < dp.firstWeekday; i++) { %>
+            <button class="dp-day is-disabled" type="button" disabled>&nbsp;</button>
+          <% } %>
+
+          <% for (let d = 1; d <= dp.daysInMonth; d++) { 
+               const info = dp.days[d-1]; %>
+            <% if (info && info.active) { %>
+              <a class="dp-day is-active" href="/admin/chatlogs/<%= userId %>/<%= info.ids.join(',') %>"><%= d %></a>
+            <% } else { %>
+              <button class="dp-day is-disabled" type="button" disabled><%= d %></button>
+            <% } %>
+          <% } %>
+        </div>
+
+        <p class="picker-context" id="picker-context">Exibindo conversa com: <strong id="selected-contact-name"><%= contact.contactname %></strong></p>
       </div>
-
-      <div class="date-picker__weekdays" id="weekdays" aria-hidden="true">
-        <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
-      </div>
-
-      <div class="date-picker__grid" id="datepicker-grid" role="grid" aria-label="Selecione uma data"></div>
-
-      <p class="picker-context" id="picker-context" style="display:none;margin-top:8px;">Exibindo conversa com: <strong id="selected-contact-name"></strong></p>
-    </div>
+    <% } %>
   </form>
 
   <!-- Conversa (SSR) -->
@@ -74,14 +99,14 @@
         <% } %>
 
       <% }) %>
-    <% } else { %>
+    <% } else if (contact) { %>
       <div style="text-align:center;color:var(--muted);padding:2rem;">Nenhuma mensagem encontrada.</div>
+    <% } else { %>
+      <div style="text-align:center;color:var(--muted);padding:2rem;">Busque um contato para visualizar as mensagens.</div>
     <% } %>
   </section>
 
-  <div style="text-align:center; margin:0 0 3.5rem;">
-    <button class="btn btn--ghost" onclick="window.scrollTo({top:0,behavior:'smooth'})">Voltar pro topo</button>
-  </div>
+
 </article>
 </main>
 
@@ -89,11 +114,9 @@
 <label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
   <span></span><span></span><span></span>
 </label>
-<!-- Overlay para fechar o menu quando aberto no mobile -->
 <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
 
 <script src="/js/admin/chatlogScripts.js"></script>
 <script src="/js/admin/adminGlobalScripts.js"></script>
 </body>
 </html>
-
