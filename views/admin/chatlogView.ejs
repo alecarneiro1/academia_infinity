@@ -2,7 +2,10 @@
 <%- include('./partials/headerPartialView') %>
 
 <main class="content">
-<article class="card block" id="mensagens">
+<article class="card block" id="mensagens"
+  data-user-id="<%= userId %>"
+  data-contact-name="<%= contact ? contact.contactname : '' %>"
+  data-ids-param="<%= idsParam || '' %>">
   <header class="block__head">
     <div>
       <h3 class="block__title">Mensagens</h3>
@@ -49,9 +52,27 @@
     </div>
   </form>
 
-  <!-- Conversa -->
+  <!-- Conversa (SSR) -->
   <section class="chat" aria-live="polite" id="chat-messages">
-    <!-- Mensagens renderizadas via JS -->
+    <% if (messages && messages.length) { %>
+      <% if (!idsParam) { %>
+        <div class="chat__day">Todas as mensagens de <b><%= contact ? contact.contactname : '' %></b></div>
+      <% } %>
+      <% messages.forEach(function(m){ %>
+        <% if (m.usermessage) { %>
+          <div class="msg msg--in">
+            <p class="msg__text"><%= m.usermessage %></p>
+            <span class="msg__time"><%= new Date(m.time).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) %></span>
+          </div>
+        <% } %>
+        <% if (m.agentresponse) { %>
+          <div class="msg msg--out">
+            <p class="msg__text"><%= m.agentresponse %></p>
+            <span class="msg__time"><%= new Date(m.time).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) %></span>
+          </div>
+        <% } %>
+      <% }) %>
+    <% } %>
   </section>
 
   <div style="text-align:center; margin:2.5rem 0 0;">

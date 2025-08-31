@@ -28,11 +28,10 @@ exports.searchContacts = async (req, res) => {
 exports.chatlogView = async (req, res) => {
   const userId = req.params.userid;
   const idsParam = req.params.ids;
-  const page = parseInt(req.query.page) || 1;
+  const wantsJson = (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1));
 
-  // Se meta=days, retorna dias com mensagens e ids por dia
+  // 1) Metadados de dias (para o datepicker)
   if (req.query.meta === 'days') {
-    // Busca todos os dias com mensagens para o contato
     const rows = await Chatlog.findAll({
       where: { contactid: userId },
       attributes: ['id', 'time'],
@@ -43,27 +42,19 @@ exports.chatlogView = async (req, res) => {
     let year = null, month = null;
     rows.forEach(r => {
       const d = new Date(r.time);
-      const dayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      if (!daysMap[dayStr]) daysMap[dayStr] = [];
-      daysMap[dayStr].push(r.id);
+      const dayStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      (daysMap[dayStr] ||= []).push(r.id);
       allIds.push(r.id);
       if (year === null) year = d.getFullYear();
       if (month === null) month = d.getMonth();
     });
-    const days = Object.keys(daysMap).map(date => ({
-      date,
-      ids: daysMap[date]
-    }));
-    // Para o título do mês
-    let monthLabel = '';
-    if (year !== null && month !== null) {
-      const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-      monthLabel = `${meses[month]} ${year}`;
-    }
+    const days = Object.keys(daysMap).map(date => ({ date, ids: daysMap[date] }));
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const monthLabel = (year !== null && month !== null) ? `${meses[month]} ${year}` : '';
     return res.json({ days, allIds, year, month, monthLabel });
   }
 
-  // Se json=1, retorna mensagens por ids
+  // 2) JSON de mensagens por ids (AJAX)
   if (req.query.json == '1' && idsParam) {
     const ids = idsParam.split(',').map(Number).filter(Boolean);
     const rows = await Chatlog.findAll({
@@ -73,34 +64,38 @@ exports.chatlogView = async (req, res) => {
     return res.json({ messages: rows });
   }
 
-  let where = { contactid: userId };
+  // 3) SSR (sem paginação)
+  const contact = await Contact.findByPk(userId);
+  const where = { contactid: userId };
+
   if (idsParam) {
     const ids = idsParam.split(',').map(Number).filter(Boolean);
     where.id = { [Op.in]: ids };
   }
-  const { count, rows } = await Chatlog.findAndCountAll({
+
+  const messages = await Chatlog.findAll({
     where,
-    order: [['id', 'ASC']],
-    offset: (page - 1) * PAGE_SIZE,
-    limit: PAGE_SIZE,
+    order: [['time', 'ASC']]
   });
-  const contact = await Contact.findByPk(userId);
-  // API para paginação
-  if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+
+  // API para paginação (se algum consumer antigo ainda chamar HTML com Accept: json)
+  if (wantsJson) {
     return res.json({
-      messages: rows.map(m => ({
+      messages: messages.map(m => ({
         id: m.id,
         usermessage: m.usermessage,
         agentresponse: m.agentresponse,
         time: m.time
       })),
-      hasMore: (page * PAGE_SIZE) < count
+      hasMore: false
     });
   }
+
+  // SSR: renderiza a página já com as mensagens
   res.render('admin/chatlogView', {
     contact,
-    messages: rows,
-    hasMore: (page * PAGE_SIZE) < count,
+    messages,
+    hasMore: false,
     userId,
     idsParam: idsParam || '',
     activePath: '/admin/chatlogs'

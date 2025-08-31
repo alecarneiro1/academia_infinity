@@ -680,6 +680,11 @@ body{
 .dp-day.is-today{
   box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 25%, transparent);
 }
+.dp-day.is-selected{
+  border-color: color-mix(in oklab, var(--primary) 85%, #000 15%);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35), 0 0 0 4px color-mix(in oklab, var(--primary) 12%, transparent);
+  transform: translateY(-2px);
+}
 
 
 

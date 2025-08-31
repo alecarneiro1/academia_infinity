@@ -125,9 +125,51 @@ document.addEventListener('DOMContentLoaded', function () {
         btnAllMessages.style.display = allMessagesIds.length ? 'inline-block' : 'none';
         btnAllMessages.onclick = () => {
           if (!allMessagesIds.length) return;
+          // remove seleção visual ao pedir "Todas"
+          datepickerGrid.querySelectorAll('.dp-day.is-selected').forEach(x => x.classList.remove('is-selected'));
           loadMessagesByIds(selectedContact.id, allMessagesIds, selectedContact.name, true);
           history.replaceState({}, '', `/admin/chatlogs/${selectedContact.id}/all`);
         };
+
+        // --- APLICAR SELEÇÃO INICIAL (se a URL veio com ids) ---
+        try {
+          const root = document.getElementById('mensagens');
+          const initialIdsParam = root?.dataset?.idsParam || '';
+          if (initialIdsParam) {
+            const targetIds = initialIdsParam.split(',').map(Number).filter(Boolean);
+            if (targetIds.length) {
+              // procurar data que contenha todos (ou ao menos algum) desses ids
+              let matchedDate = null;
+              for (const dateKey in daysByDate) {
+                const ids = daysByDate[dateKey] || [];
+                const hasAll = targetIds.every(id => ids.includes(id));
+                const hasAny = targetIds.some(id => ids.includes(id));
+                if (hasAll) { matchedDate = dateKey; break; }
+                if (hasAny && !matchedDate) matchedDate = dateKey;
+              }
+              if (matchedDate) {
+                const [y, mm, dd] = matchedDate.split('-');
+                const monthNum = Number(mm) - 1;
+                const monthIdx = monthsAvailable.findIndex(m => m.year === Number(y) && m.month === monthNum);
+                if (monthIdx >= 0) {
+                  currentMonthIndex = monthIdx;
+                  renderMonth(currentMonthIndex);
+                  // marca visualmente o dia correspondente
+                  setTimeout(() => {
+                    datepickerGrid.querySelectorAll('.dp-day.is-selected').forEach(x => x.classList.remove('is-selected'));
+                    const btn = Array.from(datepickerGrid.querySelectorAll('.dp-day')).find(b => b.textContent.trim() === String(Number(dd)));
+                    if (btn) {
+                      btn.classList.add('is-selected');
+                      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                  }, 20);
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Erro ao aplicar seleção inicial:', err);
+        }
       })
       .catch(err => {
         console.error('Erro ao buscar dias:', err);
@@ -149,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
     datepickerGrid.innerHTML = '';
     const firstDay = new Date(m.year, m.month, 1).getDay();
     const daysInMonth = new Date(m.year, m.month + 1, 0).getDate();
-    // blanks
+    // Preenche blanks antes
     for (let i = 0; i < firstDay; i++) {
       const b = document.createElement('button');
       b.className = 'dp-day is-disabled';
@@ -158,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
       b.innerHTML = '&nbsp;';
       datepickerGrid.appendChild(b);
     }
-    // days
+    // Dias do mês
     for (let d = 1; d <= daysInMonth; d++) {
       const yyyy = m.year;
       const mm = String(m.month + 1).padStart(2, '0');
@@ -171,7 +213,10 @@ document.addEventListener('DOMContentLoaded', function () {
       const ids = daysByDate[dateKey];
       if (Array.isArray(ids) && ids.length) {
         btn.classList.add('is-active');
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', function () {
+          // atualiza seleção visual
+          datepickerGrid.querySelectorAll('.dp-day.is-selected').forEach(x => x.classList.remove('is-selected'));
+          this.classList.add('is-selected');
           loadMessagesByIds(selectedContact.id, ids, selectedContact.name, false, dateKey);
           history.replaceState({}, '', `/admin/chatlogs/${selectedContact.id}/${ids.join(',')}`);
         });
@@ -181,10 +226,8 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       datepickerGrid.appendChild(btn);
     }
-    // prev/next enabled?
-    prevBtn.disabled = idx >= monthsAvailable.length - 1 ? false : false; // keep enabled if there are prev months
-    nextBtn.disabled = idx <= 0 ? true : false; // next (more recent) disabled when idx==0 (most recent)
-    // safer logic:
+
+    // Corrige lógica prev/next
     prevBtn.disabled = (idx >= monthsAvailable.length - 1);
     nextBtn.disabled = (idx <= 0);
   }
@@ -245,5 +288,20 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!dt) return '';
     const d = new Date(dt);
     return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Hidratação a partir do SSR (rota direta /admin/chatlogs/:userid[/ids])
+  const rootMensagens = document.getElementById('mensagens');
+  const initialUserId = rootMensagens?.dataset?.userId;
+  const initialContactName = rootMensagens?.dataset?.contactName || '';
+  const initialIdsParam = rootMensagens?.dataset?.idsParam || '';
+
+  if (initialUserId) {
+    selectedContact = { id: Number(initialUserId), name: initialContactName };
+    // mostra nome no "Exibindo conversa com..."
+    selectedContactName.textContent = initialContactName;
+    // carrega metadados (dias disponíveis) para o datepicker
+    loadContactDays(selectedContact.id);
+    // Observação: se HTML já veio SSR (messages já renderizadas), não re-carregamos mensagens aqui.
   }
 });
