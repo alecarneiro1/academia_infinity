@@ -92,3 +92,51 @@ document.addEventListener('DOMContentLoaded', function() {
   navToggle.checked = false;
   sidebar.style.transform = 'translateX(-100%)';
 });
+
+/* =========================
+   Scroll-to-top floating button
+   ========================= */
+(function () {
+  if (typeof window === 'undefined') return;
+  // evita duplicar
+  if (document.getElementById('fab-scroll-top')) return;
+
+  const btn = document.createElement('button');
+  btn.id = 'fab-scroll-top';
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Voltar ao topo');
+  btn.title = 'Voltar ao topo';
+  btn.innerText = '↑'; // setinha simples
+  // clique: rola ao topo
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  // acessibilidade: tecla Enter / Space ativa
+  btn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      btn.click();
+    }
+  });
+
+  document.body.appendChild(btn);
+
+  // throttle simples
+  let last = 0;
+  function onScroll() {
+    const now = Date.now();
+    if (now - last < 120) return;
+    last = now;
+    const y = window.pageYOffset || document.documentElement.scrollTop || 0;
+    if (y >= 500) {
+      btn.classList.add('is-visible');
+    } else {
+      btn.classList.remove('is-visible');
+    }
+  }
+
+  // inicializa visibilidade no load
+  setTimeout(onScroll, 50);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+})();
