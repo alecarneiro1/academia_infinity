@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const grid              = document.getElementById('datepicker-grid');
   const btnPrev           = document.getElementById('prev-month');
   const btnNext           = document.getElementById('next-month');
-  const btnAll            = document.getElementById('btn-all-messages');
   const pickerContext     = document.getElementById('picker-context');
   const selectedContactEl = document.getElementById('selected-contact-name');
   const chatMessages      = document.getElementById('chat-messages');
@@ -34,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const z = n => String(n).padStart(2,'0');
 
   // ------------- renderização -------------
-  function renderMessages(items, contactName, {all=false, dayStr=''} = {}) {
+  function renderMessages(items, contactName) {
     let html = '';
     if (contactName) {
       pickerContext.style.display = 'block';
@@ -44,18 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedContactEl.textContent = '';
     }
 
-    if (all && contactName) {
-      html += `<div class="chat__day">Todas as mensagens de <b>${escapeHtml(contactName)}</b></div>`;
-    } else if (dayStr) {
-      const [y,m,d] = dayStr.split('-');
-      html += `<div class="chat__day">${d}/${m}/${y}</div>`;
-    }
-
+    // --- Agrupamento por data ---
     if (!items.length) {
       html += `<div style="text-align:center;color:var(--muted);padding:2rem;">Nenhuma mensagem encontrada.</div>`;
+      chatMessages.innerHTML = html;
+      return;
     }
 
+    let lastDay = '';
     items.forEach(m => {
+      const d = new Date(m.time);
+      const day = `${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()}`;
+      if (day !== lastDay) {
+        html += `<div class="chat__day">${day}</div>`;
+        lastDay = day;
+      }
       if (m.usermessage) {
         html += `<div class="msg msg--in">
           <p class="msg__text">${escapeHtml(m.usermessage)}</p>
@@ -72,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chatMessages.innerHTML = html;
   }
 
-  function renderCalendar(dp, idsParam) {
+  function renderCalendar(dp) {
     if (!dp || !dp.hasData) {
       wrap.style.display = 'none';
       wrap.style.opacity = 0;
@@ -131,15 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!user) {
       renderCalendar(null);
       renderMessages([], '');
-      btnAll.style.display = 'none';
       return;
     }
     const res = await fetch(`/admin/chatlogs/api/calendar?user=${encodeURIComponent(user)}${month ? `&month=${encodeURIComponent(month)}`:''}${ids?`&ids=${encodeURIComponent(ids)}`:''}`);
     const data = await res.json();
     if (!data.ok) return;
 
-    // “Todas mensagens” visível se há contato
-    btnAll.style.display = data.contact ? 'inline-block' : 'none';
     if (data.contact) selectedContactEl.textContent = data.contact.name;
 
     renderCalendar(data.dp, ids);
@@ -153,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = await res.json();
     if (!data.ok) return;
     renderMessages(data.items, data.contact ? data.contact.name : '', { all: !ids });
-    // preserva posição
     window.scrollTo({ top: keepY });
   }
 
@@ -183,14 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
           loadCalendar();
         }
       });
-  });
-
-  btnAll?.addEventListener('click', () => {
-    // Limpa ids e recarrega mensagens (todas)
-    setParams({ ids: '' });
-    // também remove seleção visual
-    grid?.querySelectorAll('.dp-day.is-selected').forEach(el => el.classList.remove('is-selected'));
-    loadMessages();
   });
 
   // back/forward
@@ -251,13 +241,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ------------- boot -------------
-  function bootFromUrl(push=true){
+  function bootFromUrl(){
     const { user } = parseState();
     if (!user) {
       // limpar UI
       renderCalendar(null);
       renderMessages([], '');
-      btnAll.style.display='none';
+      // Remove seleção do botão "Todas mensagens" ao sair do contato
+      if (btnAll) btnAll.classList.remove('is-selected');
       return;
     }
     // carrega calendário e mensagens de acordo com ?user&ids&month
