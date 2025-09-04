@@ -1,43 +1,40 @@
-const Contact = require('../../models/contactModel');
+const Contact   = require('../../models/contactModel');
 const Matricula = require('../../models/matriculaModel');
-const Summary = require('../../models/summaryModel');
-const { Op } = require('sequelize');
+const Summary   = require('../../models/summaryModel');
+const { Op }    = require('sequelize');
 
-exports.listContacts = async (req, res) => {
-    try {
-        // Sempre busca todos os contatos, sem filtro de busca
-        const contacts = await Contact.findAll({ order: [['id', 'ASC']] });
-
-        // Busca matrículas e atendimentos para cada contato
-        const contactsWithExtras = await Promise.all(contacts.map(async c => {
-            const matricula = await Matricula.findOne({ where: { contact: c.id } });
-            const summaries = await Summary.findAll({ where: { contact: c.id }, attributes: ['id'] });
-            return {
-                ...c.dataValues,
-                matriculaId: matricula ? matricula.id : null,
-                atendimentoIds: summaries.map(s => s.id)
-            };
-        }));
-
-        res.render('admin/contactsView', {
-            contacts: contactsWithExtras,
-            activePath: req.baseUrl + req.path
-        });
-    } catch (err) {
-        console.error('Erro ao buscar contatos:', err);
-        res.status(500).send('Erro ao buscar contatos');
-    }
+// Página shell: sem carregar todos os contatos no SSR
+exports.renderContactsPage = async (req, res) => {
+  res.render('admin/contactsView', {
+    activePath: req.baseUrl + req.path
+  });
 };
 
+// AJAX com busca + paginação (offset/limit)
 exports.searchContacts = async (req, res) => {
   try {
-    const q = (req.query.q || '').trim();
-    if (!q) return res.json({ contacts: [] });
-    const contacts = await Contact.findAll({
-      where: { contactname: { [Op.iLike]: `%${q}%` } },
-      order: [['id', 'ASC']]
+    const q       = (req.query.q || '').trim();
+    const offset  = Number(req.query.offset ?? 0) || 0;
+    let   limit   = Number(req.query.limit  ?? 9) || 9;
+
+    // sanidade
+    if (limit > 50) limit = 50;
+    if (limit < 1)  limit = 1;
+
+    const where = q
+      ? { contactname: { [Op.iLike]: `%${q}%` } }
+      : {};
+
+    // Busca paginada + total
+    const { rows, count } = await Contact.findAndCountAll({
+      where,
+      order: [['id', 'DESC']], // <-- alterado para mostrar os mais recentes primeiro
+      offset,
+      limit
     });
-    const contactsWithExtras = await Promise.all(contacts.map(async c => {
+
+    // Enriquecer com matriculaId e atendimentoIds
+    const contactsWithExtras = await Promise.all(rows.map(async c => {
       const matricula = await Matricula.findOne({ where: { contact: c.id } });
       const summaries = await Summary.findAll({ where: { contact: c.id }, attributes: ['id'] });
       return {
@@ -46,8 +43,19 @@ exports.searchContacts = async (req, res) => {
         atendimentoIds: summaries.map(s => s.id)
       };
     }));
-    res.json({ contacts: contactsWithExtras });
+
+    const nextOffset = offset + rows.length;
+    const hasMore = nextOffset < count;
+
+    res.json({
+      ok: true,
+      contacts: contactsWithExtras,
+      total: count,
+      nextOffset,
+      hasMore
+    });
   } catch (err) {
-    res.json({ contacts: [] });
+    console.error('searchContacts error:', err);
+    res.status(200).json({ ok: false, contacts: [], total: 0, nextOffset: 0, hasMore: false });
   }
 };

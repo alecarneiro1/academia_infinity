@@ -37,6 +37,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const digits = String(phone || '').replace(/\D/g, '');
     return digits.startsWith('55') ? digits : (digits ? `55${digits}` : '');
   }
+  // --- NOVO: helper para horário HH:MM ---
+  function fmtHHMM(v) {
+    if (!v) return '-';
+    if (typeof v === 'string') {
+      const m = v.match(/^\s*(\d{2}):(\d{2})/);
+      if (m) return `${m[1]}:${m[2]}`;
+    }
+    const d = new Date(v);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+    return String(v).slice(0, 5);
+  }
 
   // ---------- render ----------
   function renderContext(contactInfo) {
@@ -57,9 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
         <dl class="kv">
           <dt>Contato:</dt><dd>${escapeHtml(a.contato)}</dd>
           <dt>Data:</dt><dd>${a.date ? new Date(a.date).toLocaleDateString('pt-BR') : '-'}</dd>
-          <dt>Início:</dt><dd>${escapeHtml(a.start_time || '-')}</dd>
-          <dt>Fim:</dt><dd>${escapeHtml(a.end_time || '-')}</dd>
-          <dt>Duração:</dt><dd>${a.duration_minutes ? a.duration_minutes + ' min' : '-'}</dd>
+          <dt>Início:</dt><dd>${escapeHtml(fmtHHMM(a.start_time))}</dd>
+          <dt>Fim:</dt><dd>${escapeHtml(fmtHHMM(a.end_time))}</dd>
+          <dt>Duração:</dt><dd>≅ ${a.duration_minutes ? a.duration_minutes + ' min' : '1 min'}</dd>
         </dl>
         <div class="summary">
           <h5>Resumo da conversa:</h5>
@@ -67,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="btn-row">
           ${a.contato_phoneDigits ? `<a href="https://wa.me/${a.contato_phoneDigits}" target="_blank" class="btn btn--primary">Falar com o contato</a>` : ''}
-          ${a.matriculaId ? `<a href="#" class="btn btn--outline-primary btn-matricula" data-matricula-id="${a.matriculaId}">Matrícula</a>` : ''}
+          ${a.matriculad ? `<a href="#" class="btn btn--outline-primary btn-matricula" data-matricula-id="${a.matriculaId}">Matrícula</a>` : ''}
           ${a.chatlogLink ? `<a href="${a.chatlogLink}" class="btn btn--outline-primary">Ver conversa</a>` : ''}
         </div>
       </article>
@@ -96,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const m = data.matricula;
             window.openModal(`
               <div style="max-width:460px">
-                <h3 style="margin:0 0 1rem 0;">Matrícula de ${escapeHtml(m.nome_completo || '')}</h3>
+                <h3 style="margin:0 0 1rem 0;">${escapeHtml(m.nome_completo || '')}</h3>
                 <div style="font-size:15px;line-height:1.7;">
                   <strong>Plano:</strong> ${escapeHtml(m.plano || '-')}<br>
                   <strong>WhatsApp:</strong> ${escapeHtml(m.whatsapp || '-')}<br>
@@ -108,9 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <strong>Origem:</strong> ${escapeHtml(m.origem || '-')}<br>
                   <strong>Data de cadastro:</strong> ${m.submitted_at ? new Date(m.submitted_at).toLocaleDateString('pt-BR') : '-'}
                 </div>
-                <div style="margin-top:1.5rem;text-align:right;">
-                  <button class="btn btn--primary" onclick="window.closeModal()">Fechar</button>
-                </div>
+
               </div>
             `);
           })

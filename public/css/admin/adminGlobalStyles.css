@@ -120,6 +120,25 @@ html{
   font-size: clamp(18px, 2.6vw, 22px);
   letter-spacing: .5px;
 }
+.footer{
+  bottom:0px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-top: 1px solid var(--border);
+  z-index: 30;
+}
+@media (min-width: 1024px){
+  .footer{
+    margin-left: var(--sidebar-w);
+  }
+}
+.footer__title{
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: .5px;
+  color:var(--muted);
+}
 
 /* Conteúdo principal */
 .content{
@@ -165,10 +184,16 @@ html{
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: clamp(14px, 2vw, 20px);
+  animation: card-fadein 0.45s cubic-bezier(.4,0,.2,1);
 }
 
 .card:hover {
   border-color: var(--primary);
+}
+
+@keyframes card-fadein {
+  from { opacity: 0; transform: translateY(18px);}
+  to   { opacity: 1; transform: none;}
 }
 
 
@@ -298,7 +323,11 @@ html{
     grid-template-columns: repeat(4, 1fr);
   }
 }
-
+#atendimentos-list{
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 2vw, 20px);
+}
 /* ===== Matrículas (cards em grid dentro de um card maior) ===== */
 .enroll-list{
   display: grid;
@@ -492,6 +521,8 @@ html{
   margin: 0;
   color: var(--text);
 }
+
+
 
 /* Resumo */
 .summary{
@@ -890,4 +921,16 @@ justify-content:center !important;
 /* reduz tamanho em telas muito pequenas */
 @media (max-width: 420px) {
   #fab-scroll-top { width: 40px; height: 40px; font-size: 16px; right: 12px; bottom: 16px; }
+}
+
+/* Botões de filtro do gráfico */
+.filters [data-range] {
+  /* ...existing code... */
+}
+
+/* Botão ativo do filtro do gráfico: cor primária */
+.filters [data-range].is-active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
 }

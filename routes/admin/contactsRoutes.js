@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const contactsController = require('../../controllers/admin/contactsController');
 
-router.get('/contatos/search', contactsController.searchContacts);
-router.get('/contatos', contactsController.listContacts);
+// Página (shell) — os cards vêm por AJAX
+router.get('/contatos', contactsController.renderContactsPage);
 
-module.exports = router;
+// Endpoint AJAX com paginação e busca
+router.get('/contatos/search', contactsController.searchContacts);
+
 module.exports = router;

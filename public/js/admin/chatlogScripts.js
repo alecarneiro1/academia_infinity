@@ -52,8 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let lastDay = '';
     items.forEach(m => {
+      // Agrupamento por data em UTC
       const d = new Date(m.time);
-      const day = `${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()}`;
+      const day = `${z(d.getUTCDate())}/${z(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`;
       if (day !== lastDay) {
         html += `<div class="chat__day">${day}</div>`;
         lastDay = day;
@@ -192,7 +193,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------- autocomplete -------------
   function debounce(fn, wait){ let t; return (...a)=>{clearTimeout(t); t=setTimeout(()=>fn(...a), wait);} }
   function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]); }
-  function formatTime(dt){ if(!dt) return ''; const d=new Date(dt); return d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+  // Troque a função formatTime para UTC
+  function formatTime(dt){
+    if (!dt) return '';
+    const d = new Date(dt);
+    return d.toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'UTC'
+    });
+  }
 
   const doSearch = debounce(q=>{
     if(!q){ autocompleteList.style.display='none'; return; }

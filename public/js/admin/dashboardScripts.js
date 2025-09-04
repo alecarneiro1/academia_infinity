@@ -87,8 +87,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
   
-  // Carrega o gráfico inicial (semana)
-  loadChart('week');
-  // Marca o botão da semana como ativo inicialmente
-  document.querySelector('[data-range="week"]')?.classList.add('is-active');
+  // Carrega o gráfico inicial (hoje)
+  loadChart('today');
+  // Marca o botão de "Hoje" como ativo inicialmente
+  document.querySelector('[data-range="today"]')?.classList.add('is-active');
 });

@@ -2,59 +2,46 @@
 <%- include('./partials/headerPartialView') %>
 
 <main class="content">
-<article class="card block">
-  <header class="block__head">
-    <div>
-      <h3 class="block__title">Contatos</h3>
-      <p class="block__subtitle">Lista de contatos</p>
-    </div>
-  </header>
-  <form class="searchbox ticket-search" id="contacts-search-form" role="search" onsubmit="return false">
-    <div class="search-row">
-      <div class="search-field">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor"
-            d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
-        </svg>
-        <input class="search-input" id="contacts-search-input" type="search"
-               placeholder="Pesquisar por nome…"
-               aria-label="Pesquisar atendimentos" />
+  <article class="card block">
+    <header class="block__head">
+      <div>
+        <h3 class="block__title">Contatos</h3>
+        <p class="block__subtitle">Lista de contatos</p>
       </div>
-      <!-- Removido o botão Buscar -->
-    </div>
-  </form>
-  <div class="user-list" id="user-list">
-    <% if (!contacts || contacts.length === 0) { %>
+    </header>
+
+    <!-- Busca -->
+    <form class="searchbox ticket-search" id="contacts-search-form" role="search" onsubmit="return false">
+      <div class="search-row">
+        <div class="search-field">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor"
+              d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0A4.5 4.5 0 1 1 14 9.5 4.505 4.505 0 0 1 9.5 14Z"/>
+          </svg>
+          <input class="search-input" id="contacts-search-input" type="search"
+                 placeholder="Pesquisar por nome…"
+                 aria-label="Pesquisar contatos" />
+        </div>
+      </div>
+    </form>
+
+    <!-- Lista (populada via AJAX) -->
+    <div class="user-list" id="user-list">
       <div id="contacts-empty-msg" style="color:var(--muted);padding:2rem;text-align:center;">
-        Busque um contato para visualizar os dados.
+        Carregando contatos…
       </div>
-    <% } else { %>
-      <% contacts.forEach(function(c) { %>
-        <article class="enroll-card user-card">
-          <h4 class="user-card__name"><%= c.contactname %></h4>
-          <p class="user-card__phone"><strong>WhatsApp:</strong> <%= c.contactphone %></p>
-          <div class="user-actions">
-            <a href="#" class="btn btn--primary">Falar com contato</a>
-            <% if (c.matriculaId) { %>
-              <!-- Corrigido: botão para modal, não link direto -->
-              <a href="#" class="btn btn--outline-primary btn-matricula" data-matricula-id="<%= c.matriculaId %>">Matrícula</a>
-            <% } %>
-            <% if (c.atendimentoIds && c.atendimentoIds.length) { %>
-              <a href="/admin/atendimentos/<%= c.id %>" class="btn btn--outline-primary">Atendimentos</a>
-            <% } %>
-          </div>
-        </article>
-      <% }) %>
-    <% } %>
-  </div>
-</article>
+    </div>
+  </article>
 </main>
+
+<footer class="footer">
+  <p class="footer__title">Sistema Infinity v1.0 | Hands-On Comunicação</p>
+</footer>
 
 <!-- Botão hambúrguer (mobile) -->
 <label for="nav-toggle" class="hamburger" aria-label="Abrir menu" title="Abrir menu">
   <span></span><span></span><span></span>
 </label>
-<!-- Overlay para fechar o menu quando aberto no mobile -->
 <label for="nav-toggle" class="overlay" aria-hidden="true"></label>
 
 <!-- Scripts -->
